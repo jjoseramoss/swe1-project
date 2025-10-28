@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
 const Navbar = () => {
@@ -5,8 +6,10 @@ const Navbar = () => {
     <div className="navbar bg-base-100 shadow-sm">
       <div className="flex-1">
         <Sidebar />
-        <a className="btn btn-ghost text-xl">
-          KNOW ME</a>
+
+        <Link to="/" className="btn btn-ghost text-xl">
+          Know Me
+        </Link>
       </div>
       <div className="flex gap-2">
         <input
@@ -23,7 +26,7 @@ const Navbar = () => {
             <div className="w-10 rounded-full">
               <img
                 alt="Tailwind CSS Navbar component"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                src="https://i.ebayimg.com/images/g/eT4AAOSwCzBm6ty2/s-l1200.jpg"
               />
             </div>
           </div>
@@ -38,7 +41,7 @@ const Navbar = () => {
               </a>
             </li>
             <li>
-              <a>Settings</a>
+              <Link to="/about">About</Link>
             </li>
             <li>
               <a>Logout</a>

@@ -1,30 +1,28 @@
+import {Routes, Route} from "react-router-dom";
 import Navbar from "./components/Navbar";
-import GameCard from "./components/GameCard";
+import GameSelectionPage from "./pages/GameSelectionPage";
+import About from "./pages/About";
+import GameRoom from "./pages/GameRoom";
+import JoinGameForm from "./pages/JoinGameForm";
+
 
 const App = () => {
   return (
     <div className="w-full h-screen">
       <Navbar />
 
-      <div className="flex gap-10 justify-center pt-10">
-        <GameCard 
-        title="Work Edition"
-        description="Play with work friends to get to know them better!"
-        photo="https://www.nbc.com/sites/nbcblog/files/styles/scale_862/public/2023/08/the-office-character-recap-oscar-nunez.jpg"
-        />
-        <GameCard 
-        title="Friends Edition"
-        description="Get to know your friends beter"
-        photo="https://outline-prod.imgix.net/20190321-03ScIz1cdszcAfZA7Cyt?auto=&fm=jpg&s=524d13d8e0fc8fcfed155ee7e31e4dc7"
+      <main>
+        <Routes>
+          <Route path="/" element={<GameSelectionPage/>} />
+          <Route path="/about" element={<About/>} />
+          <Route path="/game/:roomId" element={<GameRoom/>}/>
+          <Route path="/joinGame" element={<JoinGameForm/> }/>
 
-        />
-        <GameCard 
-        title="Icebreaker Edition"
-        description="Find new friends through icebreaker questions"
-        photo="https://esllibrary.s3.amazonaws.com/uploads/post/title_image/1383/Melissa_Key-Takeaways-from-TEFL-International-Webinar-on-Ice-Breaker-Games_Banner.png"
+        </Routes>
 
-        />
-      </div>
+      </main>
+
+
       
     </div>
   );

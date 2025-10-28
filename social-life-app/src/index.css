@@ -1,5 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Barrio&family=Be+Vietnam+Pro:wght@400;500;700&family=Fascinate&display=swap');
+
 @import "tailwindcss";
 @plugin "daisyui"{
   themes: light --default, dark --prefersdark, cupcake, forest, retro;
+}
+
+@theme {
+  --font-barrio: "Barrio", cursive;
+  --font-vietnam: "Be Vietnam Pro", sans-serif;
+  --font-fascinate: "Fascinate", cursive;
 }
 

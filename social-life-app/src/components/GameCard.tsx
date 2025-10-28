@@ -15,7 +15,7 @@ const GameCard = ({title, description, photo}) => {
           {description}
         </p>
         <div className="card-actions justify-end">
-          <button className="btn btn-primary">Play</button>
+          <button className="btn btn-primary">Create</button>
         </div>
       </div>
     </div>
