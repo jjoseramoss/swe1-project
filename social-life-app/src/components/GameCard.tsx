@@ -1,6 +1,10 @@
+interface Card{
+  title: string;
+  description: string;
+  photo: string;
+}
 
-
-const GameCard = ({title, description, photo}) => {
+const GameCard = ({title, description, photo}: Card) => {
   return (
     <div className="card bg-base-100 w-96 shadow-sm">
       <figure>
