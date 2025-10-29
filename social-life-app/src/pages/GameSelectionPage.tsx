@@ -6,7 +6,6 @@ const GameSelectionPage = () => {
     <div className="flex gap-10 justify-center pt-10">
 
       <Link to="/joinGame" className="btn btn-accent">Join</Link>
-
       <GameCard
         title="Work Edition"
         description="Play with work friends to get to know them better!"
