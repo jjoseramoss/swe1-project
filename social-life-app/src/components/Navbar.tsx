@@ -1,15 +1,12 @@
 import { Link } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import ChangeTheme from "./ChangeTheme";
+
 
 const Navbar = () => {
   return (
     <div className="navbar bg-base-100 shadow-sm">
       <div className="flex-1">
-        <Sidebar />
-
-        <Link to="/" className="btn btn-ghost text-xl">
-          Know Me
-        </Link>
+        <ChangeTheme/>
       </div>
       <div className="flex gap-2">
         <input

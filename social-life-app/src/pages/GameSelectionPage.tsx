@@ -1,4 +1,3 @@
-import ChangeTheme from "../components/ChangeTheme";
 import GameCard from "../components/GameCard";
 import { Link } from "react-router-dom";
 
@@ -7,7 +6,6 @@ const GameSelectionPage = () => {
     <div className="flex gap-10 justify-center pt-10">
 
       <Link to="/joinGame" className="btn btn-accent">Join</Link>
-      <ChangeTheme/>
       <GameCard
         title="Work Edition"
         description="Play with work friends to get to know them better!"
