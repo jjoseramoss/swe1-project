@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
-import ChangeTheme from "./ChangeTheme";
 
 
 const Navbar = () => {
   return (
     <div className="navbar bg-base-100 shadow-sm">
       <div className="flex-1">
-        <ChangeTheme/>
+        <Link to="/home" className="font-fascinate">
+          WHO KNOWS ME?
+        </Link>
       </div>
       <div className="flex gap-2">
         <input
@@ -39,6 +40,9 @@ const Navbar = () => {
             </li>
             <li>
               <Link to="/about">About</Link>
+            </li>
+            <li>
+              <Link to="/settings">Settings</Link>
             </li>
             <li>
               <a>Logout</a>

@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
 
 
 const Home = () => {
@@ -7,8 +6,8 @@ const Home = () => {
         <div className="h-[calc(100vh-4rem)] flex flex-col pt-8">
             <div className="flex gap-10 justify-center h-40">      
                 <figure className= "flex flex-col items-center w-full justify-center">
-                    <img src="/tempLogo.jpg" alt="game image" className="h-full w-auto"/>
-                    <h1 className="text-primary text-4xl font-bold">Know Me Game</h1>
+                    <img src="/tempLogo.jpg" alt="game image" className="rounded-full h-full w-auto"/>
+                    <h1 className="text-primary text-4xl font-bold font-fascinate">Who Knows Me? Game</h1>
                 </figure>
             </div>    
 

@@ -5,6 +5,7 @@ import About from "./pages/About";
 import GameRoom from "./pages/GameRoom";
 import JoinGameForm from "./pages/JoinGameForm";
 import Home from "./pages/Home";
+import SettingsPage from "./pages/SettingsPage";
 
 
 const App = () => {
@@ -19,6 +20,8 @@ const App = () => {
           <Route path="/about" element={<About/>} />
           <Route path="/game/:roomId" element={<GameRoom/>}/>
           <Route path="/joinGame" element={<JoinGameForm/> }/>
+          <Route path="/settings" element={<SettingsPage/>}/>
+          <Route path="/home" element={<Home/>} />
 
         </Routes>
 
