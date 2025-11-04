@@ -1,11 +1,12 @@
 import GameCard from "../components/GameCard";
-import { Link } from "react-router-dom";
+import GameNavbar from "../components/GameNavbar";
 
-const GameSelectionPage = () => {
+const GameHomePage = () => {
   return (
-    <div className="flex gap-10 justify-center pt-10">
-
-      <Link to="/joinGame" className="btn btn-accent">Join</Link>
+    <div className="w-full h-screen">
+      <GameNavbar/>
+      <h1 className="text-center text-5xl font-fascinate mt-5">Select Game Options</h1>
+      <div className="flex flex-wrap gap-10 justify-center pt-10">
       <GameCard
         title="Work Edition"
         description="Play with work friends to get to know them better!"
@@ -24,8 +25,10 @@ const GameSelectionPage = () => {
 
 
       
+      </div>
     </div>
+    
   );
 };
 
-export default GameSelectionPage;
+export default GameHomePage;

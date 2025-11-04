@@ -1,20 +1,21 @@
 import { Link } from "react-router-dom";
 
 
-const Navbar = () => {
+const GameNavbar = () => {
   return (
-    <div className="navbar bg-base-100 shadow-sm">
+    <div className="navbar bg-base-200 shadow-sm">
       <div className="flex-1">
         <Link to="/home" className="font-fascinate">
           WHO KNOWS ME?
         </Link>
       </div>
       <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Search"
-          className="input input-bordered w-24 md:w-auto"
-        />
+        <Link to="/game/join" className="btn btn-neutral font-fascinate">
+          Join Game
+        </Link>
+
+        
+
         <div className="dropdown dropdown-end">
           <div
             tabIndex={0}
@@ -29,14 +30,11 @@ const Navbar = () => {
             </div>
           </div>
           <ul
-            tabIndex="-1"
+            tabIndex={-1}
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a className="justify-between">
-                Profile
-                <span className="badge">New</span>
-              </a>
+              <Link to="/profile">Profile</Link>
             </li>
             <li>
               <Link to="/about">About</Link>
@@ -54,4 +52,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default GameNavbar;

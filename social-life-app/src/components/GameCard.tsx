@@ -7,12 +7,13 @@ interface Card{
 const GameCard = ({title, description, photo}: Card) => {
   return (
     <div className="card bg-base-100 w-96 shadow-sm">
-      <figure>
-        <img
-          src={photo}
-          alt="game image"
-        />
-      </figure>
+      <div className="h-6/10 w-full overflow-hidden">
+          <img
+            src={photo}
+            alt="game image"
+            className="w-full h-full object-cover"
+          />
+      </div>
       <div className="card-body">
         <h2 className="card-title">Who Knows Me? - {title}</h2>
         <p>
