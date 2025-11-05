@@ -13,8 +13,8 @@ const App = () => {
     <div className="w-full h-screen">
       <main>
         <Routes>
-          <Route path="/lfsj" element={<Home/>} />
-          <Route path="/" element={<GameHomePage/>} />
+          <Route path="/" element={<Home/>} />
+          <Route path="/game/home" element={<GameHomePage/>} />
           <Route path="/about" element={<About/>} />
           <Route path="/game/:roomId" element={<GameRoom/>}/>
           <Route path="/joinGame" element={<JoinGameForm/> }/>

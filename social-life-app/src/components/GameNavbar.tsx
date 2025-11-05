@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 
 const GameNavbar = () => {
   return (
-    <div className="navbar bg-base-200 shadow-sm">
+    <div className="navbar bg-base-300 shadow-sm">
       <div className="flex-1">
-        <Link to="/home" className="font-fascinate">
+        <Link to="/home" className="font-fascinate ml-3">
           WHO KNOWS ME?
         </Link>
       </div>
