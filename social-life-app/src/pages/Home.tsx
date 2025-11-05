@@ -14,7 +14,7 @@ const Home = () => {
         {/*Add Main Home Page Content Below*/}
             <div className="h-screen flex gap-10 justify-center pt-10">
                 <div className="card flex items-center bg-primary w-150 h-150 shadow-sm">
-                     <Link to="/main" className="btn btn-success mt-2 w-140">Login</Link>           
+                     <Link to="/games" className="btn btn-success mt-2 w-140">Login</Link>           
                 </div>
                 <div className="card bg-primary w-150 h-150 shadow-sm">
                     

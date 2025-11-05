@@ -19,7 +19,7 @@ const GameRoom = () => {
         <div className="card card-border bg-base-100 border-black w-75">
           <div className="card-body items-center">
             <img
-              src="https://play-lh.googleusercontent.com/lomBq_jOClZ5skh0ELcMx4HMHAMW802kp9Z02_A84JevajkqD87P48--is1rEVPfzGVf"
+              src="/qr-code.png"
               alt="qr-code"
             />
           </div>

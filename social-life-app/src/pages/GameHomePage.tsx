@@ -1,10 +1,8 @@
 import GameCard from "../components/GameCard";
-import GameNavbar from "../components/GameNavbar";
 
 const GameHomePage = () => {
   return (
     <div className="w-full h-screen">
-      <GameNavbar/>
       <h1 className="text-center text-5xl font-fascinate mt-5">Select Game Options</h1>
       <div className="flex flex-wrap gap-10 justify-center pt-10">
       <GameCard

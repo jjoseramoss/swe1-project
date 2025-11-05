@@ -14,12 +14,11 @@ const App = () => {
       <main>
         <Routes>
           <Route path="/" element={<Home/>} />
-          <Route path="/game/home" element={<GameHomePage/>} />
+          <Route path="/games" element={<GameHomePage/>} />
           <Route path="/about" element={<About/>} />
           <Route path="/game/:roomId" element={<GameRoom/>}/>
           <Route path="/joinGame" element={<JoinGameForm/> }/>
           <Route path="/settings" element={<SettingsPage/>}/>
-          <Route path="/home" element={<Home/>} />
 
         </Routes>
 
