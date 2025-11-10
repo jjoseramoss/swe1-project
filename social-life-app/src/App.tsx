@@ -5,7 +5,9 @@ import About from "./pages/About";
 import GameRoom from "./pages/GameRoom";
 import JoinGameForm from "./pages/JoinGameForm";
 import Home from "./pages/Home";
-import SettingsPage from "./pages/SettingsPage";
+import SettingsPage from "./pages/SettingsPage";  
+import Login from "./pages/login";
+import Profile from "./pages/profile";
 
 
 const App = () => {
@@ -19,7 +21,9 @@ const App = () => {
           <Route path="/game/:roomId" element={<GameRoom/>}/>
           <Route path="/joinGame" element={<JoinGameForm/> }/>
           <Route path="/settings" element={<SettingsPage/>}/>
-
+          <Route path="/login" element={<Login/>}/>
+          <Route path="/profile" element={<Profile/>}/>
+          <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
 
       </main>
