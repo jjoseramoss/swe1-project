@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   return (
@@ -39,9 +40,12 @@ const Login = () => {
             </a>
           </div>
 
-          <button type="submit" className="btn btn-primary w-full">
-            Login
-          </button>
+          <Link 
+          to="/games" 
+          type="submit" 
+          className="btn btn-primary w-full">
+          Login
+          </Link>
 
           <button type="button" className="btn btn-outline w-full">
             Sign in with Google
