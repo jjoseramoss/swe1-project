@@ -5,7 +5,7 @@ const Home = () => {
     <div className="min-h-screen relative flex flex-col items-center pt-8">
       {/* Sign In Button */}
       <Link
-        to="/games"
+        to="/login"
         className="absolute top-4 right-6 px-4 py-2 bg-gray-100 border rounded-md hover:bg-gray-200 transition"
       >
         Sign In
