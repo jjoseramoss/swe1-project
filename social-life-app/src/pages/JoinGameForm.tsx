@@ -18,11 +18,11 @@ const JoinGameForm = () => {
     <div className='w-full h-screen flex justify-center items-center bg-base-content'>
 
         <div className='flex flex-col gap-10 items-center'>
-            <h1 className='text-4xl text-white font-fascinate'>
-                WHO KNOWS ME!
+            <h1 className='text-4xl text-white font-fascinate md:text-6xl'>
+                WHO KNOWS ME?!
             </h1>
 
-            <div className='bg-white flex flex-col items-center p-5 rounded-2xl'>
+            <div className='bg-white flex flex-col items-center p-5 rounded-2xl md:w-75'>
                 <input 
                 onChange={handleChange}
                 value={gameID} 
@@ -30,11 +30,11 @@ const JoinGameForm = () => {
                 inputMode="numeric"
                 pattern="\d*"
                 maxLength={REQUIRED_LENGTH}
-                className="input" 
+                className="input md:w-full text-end" 
                 placeholder={`Enter ${REQUIRED_LENGTH}-digit PIN`}
                 
                 />
-                <Link to={`/game/${gameID}`} className={`btn mt-5 w-full  ${isValid ? "" : "opacity-50 pointer-events-none"}`} aria-disabled={!isValid}>Enter</Link>
+                <Link to={`/game/${gameID}`} className={`btn mt-5 w-full  ${isValid ? "btn-info text-white" : "opacity-50 pointer-events-none"}`} aria-disabled={!isValid}>Enter</Link>
             </div>
         </div>
 
