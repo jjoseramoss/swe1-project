@@ -1,5 +1,13 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import { socket } from "../socket-io/socket";
+
+type Message = {
+  id: string;
+  sender: string;
+  text: string;
+  time?: number;
+}
 
 // A simple clipboard icon
 const ClipboardIcon = () => (
@@ -26,6 +34,41 @@ const GameRoom = () => {
   // state to manage which tab is active on mobile
   // 'participants' or 'chat'
   const [activeTab, setActiveTab] = useState("participants");
+
+  // chat state
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("")
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    //receive messages
+    const handler = (msg: Message) => {
+      setMessages(prev => [...prev, msg]);
+    };
+    socket.on("chat message", handler);
+
+    return () => {
+      socket.off("chat message", handler);
+    };
+  }, []);
+
+  useEffect(() => {
+    //scroll to bottom when messages change
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth"});
+  }, [messages]);
+
+  const sendMessage = () => {
+    if (!input.trim()) return;
+    const msg: Message = {
+      id: Date.now().toString(),
+      sender: "You", // replace with real username later
+      text: input.trim(),
+      time: Date.now()
+    };
+    socket.emit("chat message", msg);
+    setInput("");
+    // setMessages(prev => [...prev, msg]);
+  }
 
   return (
     <div className="w-full min-h-screen flex flex-col lg:flex-row bg-base-200 lg:h-screen lg:overflow-hidden">
@@ -143,37 +186,27 @@ const GameRoom = () => {
             <h1 className="text-2xl font-barrio text-center">Chat</h1>
           </div>
 
-          {/* Text from users format*/}
+          {/* Messages (dynamic) */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {Array(25)
-              .fill(null)
-              .map((_, index) => (
-                <div className="chat chat-start">
-                  <div className="chat-header">Obi-Wan Kenobi</div>
-                  <div className="chat-bubble">You were the Chosen One!</div>
-                </div>
-              ))}
-            <div className="chat chat-start">
-              <div className="chat-header">Obi-Wan Kenobi</div>
-              <div className="chat-bubble">You were the Chosen One!</div>
-            </div>
-            <div className="chat chat-start">
-              <div className="chat-header">Obi-Wan Kenobi</div>
-              <div className="chat-bubble">I loved you.</div>
-            </div>
-            <div className="chat chat-end">
-              <div className="chat-header">Anakin Skywalker</div>
-              <div className="chat-bubble">You underestimate my power!</div>
-            </div>
+            {messages.map((m) => (
+              <div key={m.id} className={`chat ${m.sender === "You" ? "chat-end" : "chat-start"}`}>
+                  <div className="chat-header">{m.sender}</div>
+                  <div className="chat-bubble">{m.text}</div>
+              </div>
+            ))}
+            <div ref={messagesEndRef}/>
           </div>
           {/* Controls */}
           <div className="flex p-4 border-t border-base-300 shrink-0">
             <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") sendMessage();}}
               className="input border-base-300 w-full mr-2 text-end"
               placeholder="Type Here"
               type="text"
             />
-            <button className=" btn btn-info text-white">Send</button>
+            <button onClick={sendMessage} className=" btn btn-info text-white">Send</button>
           </div>
         
       </div>
