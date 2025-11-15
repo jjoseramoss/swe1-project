@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import SettingsPage from "./pages/SettingsPage";  
 import Login from "./pages/login";
 import Profile from "./pages/profile";
+import Signup from "./pages/Signup";
 
 
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="/settings" element={<SettingsPage/>}/>
           <Route path="/login" element={<Login/>}/>
           <Route path="/profile" element={<Profile/>}/>
+          <Route path="/signup" element={<Signup/>}/>
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
 
