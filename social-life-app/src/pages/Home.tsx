@@ -16,9 +16,9 @@ const Home = () => {
         <figure className="w-full">
           <div className="rounded-3xl border-8 border-gray-600 p-3">
             <img
-              src="/tempLogo.jpg"
+              src="/wkme-home-banner.jpg"
               alt="hero"
-              className="w-full h-72 md:h-80 object-cover rounded-2xl"
+              className="w-full h-72 md:h-80 object-cover  rounded-2xl"
             />
           </div>
           <h1 className="mt-10 text-center text-3xl md:text-4xl text-gray-600 italic">
@@ -28,13 +28,13 @@ const Home = () => {
       </div>
 
       {/* About Section */}
-      <div className="mt-8 w-11/12 md:w-4/5 flex flex-col md:flex-row gap-10 justify-center">
+      <div className="mt-8 w-11/12 md:w-4/5 flex flex-col md:flex-row gap-10 pb-10 justify-center">
         {/* Card 1 */}
         <div className="card w-full md:w-1/3 rounded-lg border bg-white shadow-sm p-6 flex items-start gap-6">
           <div className="w-16 h-16 rounded-md bg-gray-200 border shrink-0" />
           <div className="flex-1 space-y-3">
             <div className="h-3 bg-gray-200 rounded" />
-            <div className="h-3 bg-gray-200 rounded w-11/12" />
+            <p>EXPLORE</p>
             <div className="h-3 bg-gray-200 rounded w-10/12" />
           </div>
         </div>
@@ -44,7 +44,7 @@ const Home = () => {
           <div className="w-16 h-16 rounded-md bg-gray-200 border shrink-0" />
           <div className="flex-1 space-y-3">
             <div className="h-3 bg-gray-200 rounded" />
-            <div className="h-3 bg-gray-200 rounded w-11/12" />
+            <p>ANSWER</p>
             <div className="h-3 bg-gray-200 rounded w-10/12" />
           </div>
         </div>
@@ -54,7 +54,7 @@ const Home = () => {
           <div className="w-16 h-16 rounded-md bg-gray-200 border shrink-0" />
           <div className="flex-1 space-y-3">
             <div className="h-3 bg-gray-200 rounded" />
-            <div className="h-3 bg-gray-200 rounded w-11/12" />
+            <p>CONNECT</p>
             <div className="h-3 bg-gray-200 rounded w-10/12" />
           </div>
         </div>

@@ -1,4 +1,4 @@
-import ChangeTheme from "../components/ChangeTheme"
+import ChangeTheme from "../components/common/ChangeTheme"
 
 const SettingsPage = () => {
   return (

@@ -1,13 +1,12 @@
 import {Routes, Route} from "react-router-dom";
-import Navbar from "./components/GameNavbar";
 import GameHomePage from "./pages/GameHomePage";
 import About from "./pages/About";
 import GameRoom from "./pages/GameRoom";
 import JoinGameForm from "./pages/JoinGameForm";
 import Home from "./pages/Home";
 import SettingsPage from "./pages/SettingsPage";  
-import Login from "./pages/login";
-import Profile from "./pages/profile";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 import Signup from "./pages/Signup";
 
 

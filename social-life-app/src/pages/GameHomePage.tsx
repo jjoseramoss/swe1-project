@@ -1,4 +1,4 @@
-import GameCard from "../components/GameCard";
+import GameCard from "../components/common/GameCard";
 
 const GameHomePage = () => {
   return (

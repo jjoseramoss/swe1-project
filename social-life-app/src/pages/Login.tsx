@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { auth } from "../firebase";
+import { auth } from "../lib/firebase";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -25,7 +25,7 @@ const Login = () => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/profile");
+      navigate("/games");
     } catch (err: any) {
       setError(err.message);
     }
@@ -42,7 +42,7 @@ const Login = () => {
 
     try {
       await signInWithPopup(auth, provider);
-      navigate("/profile");
+      navigate("/games");
     } catch (err: any) {
       setError(err.message);
     }
