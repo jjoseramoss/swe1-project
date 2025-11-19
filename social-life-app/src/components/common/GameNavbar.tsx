@@ -1,4 +1,8 @@
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router";
+
+// get current location page
+
 
 // A simple hamburger icon component
 const HamburgerIcon = () => (
@@ -19,15 +23,11 @@ const HamburgerIcon = () => (
 );
 
 const GameNavbar = () => {
+  const location = useLocation();
+  const currentPath = location.pathname;
   return (
-    <div className="navbar bg-base-300 shadow-sm">
-      {/* Before */}
-      {/* <div className="flex-1">
-        <Link to="/" className="font-fascinate ml-3">
-          WHO KNOWS ME?
-        </Link>
-      </div> */}
-
+    // If current path = / - "Home" then dont show
+    <div className={`navbar bg-base-300 shadow-sm ${currentPath === "/" ? 'hidden' : '' } `}>
       <div className="navbar-start">
         {/* Mobile Hamburger Menu: ONLY MOBILE */}
         <div className="dropdown md:hidden">
@@ -100,6 +100,9 @@ const GameNavbar = () => {
           >
             <li>
               <Link to="/profile">Profile</Link>
+            </li>
+            <li>
+              <Link to="/games">Games</Link>
             </li>
             <li>
               <Link to="/about">About</Link>
