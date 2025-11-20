@@ -3,6 +3,7 @@ import { useAuth } from "../contexts/AuthProvider";
 
 const Profile = () => {
   const { user, loading, getIdToken } = useAuth();
+  console.log(user)
   const [username, setUsername] = useState("User");
   const [bio, setBio] = useState("Hello! I’m new here 😄");
   const [socials, setSocials] = useState({
@@ -20,7 +21,7 @@ const Profile = () => {
     <div className="flex justify-center items-center min-h-screen bg-base-200">
       <div className="card w-96 bg-base-100 shadow-xl p-6 rounded-3xl">
         <h2 className="text-2xl font-semibold text-center mb-4">Profile</h2>
-
+        <p className="text-center p-2 font-bold">{user.email}</p>
         {/* Profile Picture */}
         <div className="flex flex-col items-center mb-4">
           <div className="avatar">
