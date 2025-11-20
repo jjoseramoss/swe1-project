@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router";
+import { useAuth } from "../../contexts/AuthProvider";
 
 // A simple hamburger icon component
 const HamburgerIcon = () => (
@@ -20,6 +21,8 @@ const HamburgerIcon = () => (
 );
 
 const GameNavbar = () => {
+  const { user } = useAuth();
+
   const location = useLocation();
   const currentPath = location.pathname;
   return (
@@ -84,7 +87,7 @@ const GameNavbar = () => {
             <div className="w-10 rounded-full border">
               <img
                 alt="User Avatar"
-                src="https://i.ebayimg.com/images/g/eT4AAOSwCzBm6ty2/s-l1200.jpg"
+                src={user?.avatarUrl}
                 onError={(e) => {
                   e.currentTarget.src = 'https://placehold.co/40x40/000000/FFFFFF?text=A'; // Fallback
                 }}

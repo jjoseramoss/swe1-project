@@ -22,30 +22,25 @@ const Signup = () => {
       return;
     }
 
-    try {
+    
       setLoading(true);
-
+      try {
       // Create user in Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Create user document in Firestore
+      // Write user data to Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
-        username: user.email,
         email: user.email,
-        bio: "Welcome to Who Knows ME!?",
-        links: [],
-        avatarUrl: "https://img.freepik.com/premium-vector/user-profile-icon-circle_1256048-12499.jpg?semt=ais_incoming&w=740&q=80",
+        displayName: "",
+        bio: "",
+        avatarUrl: "https://tr.rbxcdn.com/180DAY-9b442dba882d0e6da150f1f40faab709/420/420/FaceAccessory/Webp/noFilter",
+        createdAt: new Date(),
+        links: []
       });
 
       navigate("/profile");
-
     } catch (err: any) {
       setError(err.message);
     }
@@ -56,7 +51,9 @@ const Signup = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-base-200">
       <div className="card w-96 shadow-xl bg-base-100 p-6 rounded-3xl">
-        <h2 className="text-3xl font-semibold text-center mb-6">Create Account</h2>
+        <h2 className="text-3xl font-semibold text-center mb-6">
+          Create Account
+        </h2>
 
         {error && (
           <div className="alert alert-error mb-4">

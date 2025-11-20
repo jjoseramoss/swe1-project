@@ -1,13 +1,20 @@
 import { useState } from "react";
+import { useAuth } from "../contexts/AuthProvider";
 
 const Profile = () => {
-  const [username, setUsername] = useState("User123");
+  const { user, loading, getIdToken } = useAuth();
+  const [username, setUsername] = useState("User");
   const [bio, setBio] = useState("Hello! I’m new here 😄");
   const [socials, setSocials] = useState({
     twitter: "",
     instagram: "",
     github: "",
   });
+
+  if (loading) return <div>Loading...</div>;
+
+  if (!user) return <div>Please log in to view your profile.</div>;
+
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-base-200">
@@ -18,10 +25,10 @@ const Profile = () => {
         <div className="flex flex-col items-center mb-4">
           <div className="avatar">
             <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-              <img src="https://i.ebayimg.com/images/g/eT4AAOSwCzBm6ty2/s-l1200.jpg" alt="Profile" />
+              <img src={user.avatarUrl} alt="User Profile Picture" />
             </div>
           </div>
-          <button className="btn btn-outline btn-sm mt-2">Change Picture</button>
+          <button className="btn btn-outline btn-sm mt-2">Change Avatar</button>
         </div>
 
         {/* Username */}

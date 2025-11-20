@@ -34,40 +34,26 @@ const Login = () => {
     setLoading(false);
   };
 
-  const createUserDoc = async (user) => {
-    if (!user) return;
-
-    const userDocRef = doc(db, "users", user.uid);
-    const userData = {
-      uid: user.uid,
-      username: user.email,
-      email: user.email,
-      bio: "Welcome to Who Knows ME!?",
-      links: [],
-      avatarUrl:
-        "https://img.freepik.com/premium-vector/user-profile-icon-circle_1256048-12499.jpg?semt=ais_incoming&w=740&q=80",
-    };
-
-    try {
-      await setDoc(userDocRef, userData, { merge: true }) // merge: true if user exists!
-      console.log("User Documented Successfully");
-    } catch ( error ){
-      console.error("Error writing user document: ", error)
-    }
-  };
 
   // Google Login
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError("");
-
     const provider = new GoogleAuthProvider();
-
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      await createUserDoc(user);
+      // Write user data to Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || "",
+        bio: "",
+        avatarUrl: "https://tr.rbxcdn.com/180DAY-9b442dba882d0e6da150f1f40faab709/420/420/FaceAccessory/Webp/noFilter",
+        createdAt: new Date(),
+        links: [],
+      })
 
       navigate("/games");
     } catch (error) {
