@@ -36,10 +36,12 @@ const Signup = () => {
 
       // Create user document in Firestore
       await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        username: user.email,
         email: user.email,
-        createdAt: Date.now(),
-        displayName: "",
-        bio: "",
+        bio: "Welcome to Who Knows ME!?",
+        links: [],
+        avatarUrl: "https://img.freepik.com/premium-vector/user-profile-icon-circle_1256048-12499.jpg?semt=ais_incoming&w=740&q=80",
       });
 
       navigate("/profile");

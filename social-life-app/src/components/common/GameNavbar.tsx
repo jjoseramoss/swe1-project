@@ -1,9 +1,6 @@
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router";
 
-// get current location page
-
-
 // A simple hamburger icon component
 const HamburgerIcon = () => (
   <svg

@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { auth } from "../lib/firebase";
+import { auth, db } from "../lib/firebase";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-
 
 const Login = () => {
   const navigate = useNavigate();
@@ -25,12 +25,35 @@ const Login = () => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
+
       navigate("/games");
     } catch (err: any) {
       setError(err.message);
     }
 
     setLoading(false);
+  };
+
+  const createUserDoc = async (user) => {
+    if (!user) return;
+
+    const userDocRef = doc(db, "users", user.uid);
+    const userData = {
+      uid: user.uid,
+      username: user.email,
+      email: user.email,
+      bio: "Welcome to Who Knows ME!?",
+      links: [],
+      avatarUrl:
+        "https://img.freepik.com/premium-vector/user-profile-icon-circle_1256048-12499.jpg?semt=ais_incoming&w=740&q=80",
+    };
+
+    try {
+      await setDoc(userDocRef, userData, { merge: true }) // merge: true if user exists!
+      console.log("User Documented Successfully");
+    } catch ( error ){
+      console.error("Error writing user document: ", error)
+    }
   };
 
   // Google Login
@@ -41,10 +64,14 @@ const Login = () => {
     const provider = new GoogleAuthProvider();
 
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      await createUserDoc(user);
+
       navigate("/games");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error) {
+      setError(error.message);
     }
 
     setLoading(false);
@@ -113,11 +140,11 @@ const Login = () => {
           >
             Sign in with Google
           </button>
-           <div className="text-center mt-3">
+          <div className="text-center mt-3">
             <span>Don't have an account? </span>
-              <Link to="/signup" className="link text-secondary">
-                Create account
-              </Link>
+            <Link to="/signup" className="link text-secondary">
+              Create account
+            </Link>
           </div>
         </form>
       </div>
