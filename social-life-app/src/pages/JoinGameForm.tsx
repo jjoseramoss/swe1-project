@@ -7,8 +7,7 @@ import { useAuth } from "../contexts/AuthProvider";
 const JoinGameForm = () => {
   const navigate = useNavigate();
   const { user, loading} = useAuth();
-  if (loading) return <div>Loading...</div>;
-  if (!user) navigate("/login");
+  
   const REQUIRED_LENGTH = 4; // change according to how long we want PIN
   const [gameID, setGameID] = useState<string>("");
 
@@ -20,7 +19,8 @@ const JoinGameForm = () => {
 
   const isValid = (gameID.length === REQUIRED_LENGTH);
 
-
+  if (loading) return <div>Loading...</div>;
+  if (!user) navigate("/login");
   return (
     <>
       <GameNavbar/>

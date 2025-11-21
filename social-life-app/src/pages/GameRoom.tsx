@@ -15,7 +15,7 @@ type Message = {
 }
 
 // A simple clipboard icon
- 
+/* 
 const ClipboardIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -32,14 +32,10 @@ const ClipboardIcon = () => (
     />
   </svg>
 );
-
+*/
 const GameRoom = () => {
   const { user, loading} = useAuth();
   const navigate = useNavigate();
-
-  if (loading) return <div>Loading...</div>;
-  if (!user) navigate("/login");
-
   const { roomId } = useParams();
   const numberOfUsers: number = 20;
 
@@ -93,6 +89,8 @@ const GameRoom = () => {
     setInput("");
     setMessages(prev => [...prev, msg]);
   }
+  if (loading) return <div>Loading...</div>;
+  if (!user) navigate("/login");
 
   return (
     <>

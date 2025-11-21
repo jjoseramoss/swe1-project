@@ -27,12 +27,12 @@ const Profile = () => {
       <div className="flex justify-center items-center min-h-screen bg-base-200">
         <div className="card w-96 bg-base-100 shadow-xl p-6 rounded-3xl">
           <h2 className="text-2xl font-semibold text-center mb-4">Profile</h2>
-          <p className="text-center p-2 font-bold">{user.email}</p>
+          <p className="text-center p-2 font-bold">{user?.email}</p>
           {/* Profile Picture */}
           <div className="flex flex-col items-center mb-4">
             <div className="avatar">
               <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                <img src={user.avatarUrl} alt="User Profile Picture" />
+                <img src={user?.avatarUrl} alt="User Profile Picture" />
               </div>
             </div>
             <button className="btn btn-outline btn-sm mt-2">Change Avatar</button>
