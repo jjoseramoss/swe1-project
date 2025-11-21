@@ -41,8 +41,9 @@ const Signup = () => {
       });
 
       navigate("/profile");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if(err instanceof Error)
+        setError(err.message);
     }
 
     setLoading(false);

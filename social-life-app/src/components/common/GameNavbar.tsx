@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useLocation} from "react-router";
+//import { useLocation} from "react-router";
 import { useAuth } from "../../contexts/AuthProvider";
 import { signOut } from "firebase/auth";
 import { auth } from "../../lib/firebase";
@@ -25,8 +25,8 @@ const HamburgerIcon = () => (
 const GameNavbar = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const currentPath = location.pathname;
+  //const location = useLocation();
+  //const currentPath = location.pathname;
 
   // Logout user
 
@@ -41,9 +41,7 @@ const GameNavbar = () => {
   return (
     // If current path = / - "Home" then dont show
     <div
-      className={`navbar bg-base-300 shadow-sm ${
-        currentPath === "/" ? "hidden" : ""
-      } `}
+      className={`navbar bg-base-300 shadow-sm`}
     >
       <div className="navbar-start">
         {/* Mobile Hamburger Menu: ONLY MOBILE */}

@@ -27,8 +27,9 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, email, password);
 
       navigate("/games");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if(err instanceof Error)
+        setError(err.message);
     }
 
     setLoading(false);
@@ -56,8 +57,9 @@ const Login = () => {
       })
 
       navigate("/games");
-    } catch (error) {
-      setError(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error)
+        setError(error.message);
     }
 
     setLoading(false);

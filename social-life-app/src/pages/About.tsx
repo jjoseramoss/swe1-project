@@ -1,6 +1,12 @@
+import GameNavbar from "../components/common/GameNavbar"
+
 const About = () => {
   return (
-    <div>About</div>
+    <>
+      <GameNavbar/>
+      <div>About</div>
+    </>
+    
   )
 }
 
