@@ -1,9 +1,15 @@
 import { Link } from "react-router-dom";
 import Footer from "../components/common/Footer";
+import { useAuth } from "../contexts/AuthProvider";
+import GameNavbar from "../components/common/GameNavbar";
 
 const Home = () => {
+  const { user } = useAuth();
   return (
     <>
+      <div style={{display: user ? "block" : "none" }}>
+        <GameNavbar/>
+      </div>
       <div className="min-h-screen bg-base-100 flex flex-col font-sans text-base-content">
         
         {/* --- SECTION 1: HERO (Top Login Button) --- */}

@@ -1,8 +1,9 @@
+import type { ChangeEvent } from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import GameNavbar from "../components/common/GameNavbar";
 import { useNavigate } from "react-router-dom";
+import GameNavbar from "../components/common/GameNavbar";
 import { useAuth } from "../contexts/AuthProvider";
+import { socket } from "../lib/socket-io/socket";
 
 const JoinGameForm = () => {
   const navigate = useNavigate();
@@ -10,6 +11,8 @@ const JoinGameForm = () => {
   
   const REQUIRED_LENGTH = 4; // change according to how long we want PIN
   const [gameID, setGameID] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [isChecking, setIsChecking] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     //keep only digits and limit length
@@ -18,6 +21,20 @@ const JoinGameForm = () => {
   }
 
   const isValid = (gameID.length === REQUIRED_LENGTH);
+
+  const handleJoin = () => {
+    if (!isValid || isChecking) return;
+    setError("");
+    setIsChecking(true);
+    socket.emit("validate-room-code", gameID, (res: { ok: boolean }) => {
+      setIsChecking(false);
+      if (res?.ok) {
+        navigate(`/game/${gameID}`);
+      } else {
+        setError("Room not found or inactive.");
+      }
+    });
+  };
 
   if (loading) return <div>Loading...</div>;
   if (!user) navigate("/login");
@@ -43,7 +60,15 @@ const JoinGameForm = () => {
                   placeholder={`Enter ${REQUIRED_LENGTH}-digit PIN`}
                   
                   />
-                  <Link to={`/game/${gameID}`} className={`btn mt-5 w-full  ${isValid ? "btn-info text-white" : "opacity-50 pointer-events-none"}`} aria-disabled={!isValid}>Enter</Link>
+                  <button 
+                    onClick={handleJoin}
+                    className={`btn mt-5 w-full  ${isValid && !isChecking ? "btn-info text-white" : "opacity-50 pointer-events-none"}`} 
+                    aria-disabled={!isValid || isChecking}
+                    disabled={!isValid || isChecking}
+                  >
+                    {isChecking ? "Checking..." : "Enter"}
+                  </button>
+                  {error && <p className="text-red-500 mt-2">{error}</p>}
               </div>
           </div>
 
