@@ -1,69 +1,86 @@
+// ...existing code...
 import { Link } from "react-router-dom";
-
+import Footer from "../components/common/Footer";
 const Home = () => {
   return (
     <>
-      <div className="min-h-screen relative flex flex-col items-center pt-8">
-        {/* Sign In Button */}
-        <Link
-          to="/login"
-          className="absolute top-4 right-6 px-4 py-2 bg-gray-100 border rounded-md hover:bg-gray-200 transition"
-        >
-          Sign In
-        </Link>
-
-        {/* Hero Section */}
-        <div className="w-11/12 md:w-4/5">
-        
-          <figure className="w-full">
-            <div className="rounded-3xl border-8 border-gray-600 p-3">
-              <img
-                src="/wkme-home-banner.jpg"
-                alt="hero"
-                className="w-full h-72 md:h-80 object-cover  rounded-2xl"
-              />
-            </div>
-            <h1 className="mt-10 text-center text-3xl md:text-4xl text-gray-600 italic">
-              About
-            </h1>
-          </figure>
+      <div className="min-h-screen bg-neutral-100 relative flex flex-col items-center pt-8">
+        {/* Title */}
+        <div className="w-full border-b-2">
+          <h1 className="font-fascinate text-4xl text-center pb-5">
+          WHO KNOWS ME ?!
+        </h1>
         </div>
 
-        {/* About Section */}
-        <div className="mt-8 w-11/12 md:w-4/5 flex flex-col md:flex-row gap-10 pb-10 justify-center">
-          {/* Card 1 */}
-          <div className="card w-full md:w-1/3 rounded-lg border bg-white shadow-sm p-6 flex items-start gap-6">
-            <div className="w-16 h-16 rounded-md bg-gray-200 border shrink-0" />
-            <div className="flex-1 space-y-3">
-              <div className="h-3 bg-gray-200 rounded" />
-              <p>EXPLORE</p>
-              <div className="h-3 bg-gray-200 rounded w-10/12" />
+        <main className="flex-1 flex flex-col w-full">
+          <div className="w-full">
+            <div className="hero min-h-[40vh] md:min-h-[40vh]">
+              <div className="hero-content text-center">
+                <div className="max-w-md w-full">
+                  <div className="border rounded-full">
+                    <img className="rounded-full" src="../public/wkme-home-banner.jpg" alt="game banner" />
+                  </div>
+                  <p className="py-6 text-xl">
+                    A fun social party game where you discover how well your
+                    friends really know you. Play instantly on any device
+                  </p>
+                  <Link to="/login" className="btn btn-accent text-2xl w-full rounded">
+                    Login
+                  </Link>
+                </div>
+              </div>
             </div>
+          </div>
+          <div className="flex w-full items-center flex-col p-5">
+            <h2 className="font-barrio font-bold text-3xl pb-5">
+              How it Works 🚀
+            </h2>
+            <ul className="list text-lg">
+              <li className="list-row bg-success">
+                ⚫ Create or Join a Room | Use a quick room code to get everyone
+                connecter
+              </li>
+              <li className="list-row">
+                ⚫ Answer Questions | Share funny, honest, or suprising answers
+                about yourself
+              </li>
+              <li className="list-row bg-success">
+                ⚫ Guess & Compete | Try to match your friends' answers and climb
+                the leaderboard
+              </li>
+            </ul>
           </div>
 
-          {/* Card 2 */}
-          <div className="card w-full md:w-1/3 rounded-lg border bg-white shadow-sm p-6 flex items-start gap-6">
-            <div className="w-16 h-16 rounded-md bg-gray-200 border shrink-0" />
-            <div className="flex-1 space-y-3">
-              <div className="h-3 bg-gray-200 rounded" />
-              <p>ANSWER</p>
-              <div className="h-3 bg-gray-200 rounded w-10/12" />
-            </div>
+          <div className="flex w-full justify-center flex-col p-5 text-xl font-fascinate font-bold">
+            <div className="divider divider-start divider-accent">Join</div>
+            <div className="divider divider-secondary">Network</div>
+            <div className="divider divider-end divider-accent">Connect</div>
           </div>
 
-          {/* Card 3 (new sibling) */}
-          <div className="card w-full md:w-1/3 rounded-lg border bg-white shadow-sm p-6 flex items-start gap-6">
-            <div className="w-16 h-16 rounded-md bg-gray-200 border shrink-0" />
-            <div className="flex-1 space-y-3">
-              <div className="h-3 bg-gray-200 rounded" />
-              <p>CONNECT</p>
-              <div className="h-3 bg-gray-200 rounded w-10/12" />
-            </div>
+          <div className="flex w-full items-center flex-col p-5">
+            <h2 className="font-barrio font-bold text-3xl pb-5">
+              Why You'll love it 🔥
+            </h2>
+            <ul className="list text-lg">
+              <li className="list-row bg-secondary">
+                ⚫ Easy to play anywhere
+              </li>
+              <li className="list-row">⚫ Great icebreaker for any group</li>
+              <li className="list-row bg-accent">
+                ⚫ Fast, fun, and full of laughs
+              </li>
+              <li className="list-row">
+                ⚫ Works on phones, tablets, and laptops
+              </li>
+            </ul>
           </div>
-        </div>
+        </main>
+        {/* Footer  */}
+        <Footer />
       </div>
     </>
   );
 };
 
 export default Home;
+// ...existing code...

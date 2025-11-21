@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 const Profile = () => {
   
   const { user, loading/** , getIdToken*/} = useAuth();
-  console.log(user)
   const [username, setUsername] = useState("User");
   const [bio, setBio] = useState("Hello! I’m new here 😄");
   const [socials, setSocials] = useState({
