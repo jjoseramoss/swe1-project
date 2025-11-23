@@ -35,9 +35,9 @@ const Signup = () => {
         email: user.email,
         displayName: "",
         bio: "",
-        avatarUrl: "https://tr.rbxcdn.com/180DAY-9b442dba882d0e6da150f1f40faab709/420/420/FaceAccessory/Webp/noFilter",
+        avatarUrl: "think-monkey.jpg",
         createdAt: new Date(),
-        links: []
+        insta: ""
       });
 
       navigate("/profile");

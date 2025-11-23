@@ -103,7 +103,7 @@ const GameNavbar = () => {
             <div className="w-10 rounded-full border">
               <img
                 alt="User Avatar"
-                src={user?.avatarUrl}
+                src={`../avatars/${user?.avatarUrl}`}
                 onError={(e) => {
                   e.currentTarget.src =
                     "https://placehold.co/40x40/000000/FFFFFF?text=A"; // Fallback

@@ -10,6 +10,8 @@ type AppUser = {
   email?: string | null;
   displayName?: string;
   avatarUrl?: string;
+  bio?: string;
+  insta?: string;
 };
 
 type AuthContextType = {
@@ -44,6 +46,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           email: u.email,
           displayName: data?.displayName || u.displayName || "",
           avatarUrl: data?.avatarUrl || "",
+          bio: data?.bio || "",
+          insta: data?.insta || ""
         });
       } else {
         setUser(null);

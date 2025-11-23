@@ -5,7 +5,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
@@ -28,13 +28,11 @@ const Login = () => {
 
       navigate("/games");
     } catch (err: unknown) {
-      if(err instanceof Error)
-        setError(err.message);
+      if (err instanceof Error) setError(err.message);
     }
 
     setLoading(false);
   };
-
 
   // Google Login
   const handleGoogleLogin = async () => {
@@ -45,21 +43,25 @@ const Login = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Write user data to Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName || "",
-        bio: "",
-        avatarUrl: "https://tr.rbxcdn.com/180DAY-9b442dba882d0e6da150f1f40faab709/420/420/FaceAccessory/Webp/noFilter",
-        createdAt: new Date(),
-        links: [],
-      })
+      const userRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userRef);
+
+      if (!snap.exists()) {
+        // Write user data to Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName || "",
+          bio: "",
+          avatarUrl: "think-monkey.jpg",
+          createdAt: new Date(),
+          insta: "",
+        });
+      }
 
       navigate("/games");
     } catch (error: unknown) {
-      if (error instanceof Error)
-        setError(error.message);
+      if (error instanceof Error) setError(error.message);
     }
 
     setLoading(false);
