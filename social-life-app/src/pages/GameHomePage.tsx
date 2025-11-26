@@ -15,7 +15,7 @@ const GameHomePage = () => {
     <>
       <GameNavbar/>
       <div className="w-full h-screen">
-        <h1 className="text-center text-5xl font-fascinate mt-5">Select Game Options</h1>
+        <h1 className="text-center text-5xl font-excali mt-5">Select Game Options</h1>
         <div className="flex flex-wrap gap-10 justify-center pt-10">
         <GameCard
           title="Work Edition"
