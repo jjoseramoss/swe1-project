@@ -11,7 +11,10 @@ const Home = () => {
         <GameNavbar/>
       </div>
       <div className="min-h-screen bg-base-100 flex flex-col font-sans text-base-content">
-        
+        {/* Testing Pages */}
+        <div>
+          <Link className="btn" to="/gameplay">GameRoom</Link>
+        </div>
         {/* --- SECTION 1: HERO (Top Login Button) --- */}
         <div className="hero min-h-[60vh] bg-base-200/50 pt-8 pb-10">
           <div className="hero-content flex-col lg:flex-row-reverse gap-10 w-full max-w-6xl px-4">
