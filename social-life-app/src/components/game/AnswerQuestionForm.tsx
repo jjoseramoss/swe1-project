@@ -1,30 +1,32 @@
 import { useState } from "react";
 
-const MakeQuestionForm = () => {
-  const [question, setQuestion] = useState("");
-  
+const AnswerQuestionForm = () => {
+  const [answer, setAnswer] = useState("");
+  const question = "What is my favorite color??"
+  const questionUser = "Jomama"
   const handleSubmit = () => {
-    console.log(question)
+    console.log(answer)
   }
 
   return (
     <div className="w-full min-h-screen flex justify-center items-start bg-base-content py-8">
       <div className="flex flex-col items-center w-full">
         <h1 className="text-4xl pt-6 font-excali text-primary-content md:text-6xl text-center mb-10">
-          You've Been Chosen!!
+          {questionUser} Question:
         </h1>
+        <p className="text-primary-content text-center font-excali text-5xl">{question}</p>
 
         {/* responsive card: mobile 75%, desktop 33%, capped width */}
         <div className="card w-3/4 md:w-1/3 max-w-[720px]  bg-white flex flex-col items-center p-5 rounded-2xl flex-none mx-auto mt-6 ">
           <div className="w-full ">
             <h2 className="card-title text-2xl md:text-3xl  text-gray-400 font-excali mb-5">
-              Create A Question?
+              Answer:
             </h2>
             {/* Input Box */}
             <textarea
-              onChange={(e) => setQuestion(e.target.value)}
-              value={question}
-              placeholder="Your Question..."
+              onChange={(e) => setAnswer(e.target.value)}
+              value={answer}
+              placeholder="Your Answer..."
               className="textarea textarea-bordered font-excali w-full min-h-[120px] md:min-h-40 resize-vertical mb-5"
             />
           </div>
@@ -60,4 +62,4 @@ const MakeQuestionForm = () => {
   );
 };
 
-export default MakeQuestionForm;
+export default AnswerQuestionForm;

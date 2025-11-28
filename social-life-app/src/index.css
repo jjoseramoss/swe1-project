@@ -1,9 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Barrio&family=Be+Vietnam+Pro:wght@400;500;700&family=Fascinate&display=swap');
+
+
 @font-face {
   font-family: excali;
   src: url("../src/assets/fonts/Excalifont-Regular.woff2")
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Barrio&family=Be+Vietnam+Pro:wght@400;500;700&family=Fascinate&display=swap');
 
 @import "tailwindcss";
 @plugin "daisyui"{
