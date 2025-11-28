@@ -11,6 +11,9 @@ import Signup from "./pages/Signup";
 import GameRoom from "./pages/GameRoom";
 
 const App = () => {
+  
+
+
   return (
     <div className="w-full h-screen">
       <main>
