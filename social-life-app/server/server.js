@@ -17,7 +17,7 @@ const createRoomData = () => ({
     scores: new Map(),
     userIds: new Set(),
     answers: new Map(),
-    question: "",
+    question: new String,
     gameState: new String,
     //game states: start, question, answer, finished
 });
@@ -35,9 +35,11 @@ const logActiveRooms = (label) => {
         userIds: Array.from(data.userIds),
         scores: Array.from(data.scores.entries()),
         answers: Array.from(data.answers.entries()),
+        question: data.question,
         state: data.gameState,
     }));
-    console.log(label, snapshot);
+    console.log(label);
+    console.dir(snapshot, { depth: null });
 };
 
 //every time a client connects to server, gives them a socket instance for each user
@@ -62,14 +64,14 @@ io.on('connection', socket => {
     socket.on("join-lobby", (roomCode, maybeUserId, maybeReply) => {
       const userId = typeof maybeUserId === 'string' ? maybeUserId : undefined;
       const reply = typeof maybeUserId === 'function' ? maybeUserId : (typeof maybeReply === 'function' ? maybeReply : undefined);
-      const room = typeof roomCode === 'string' ? activeRooms.get(roomCode) : undefined;
+      const room = activeRooms.get(roomCode);
       const exists = !!room;
       if (room) {
         socket.join(roomCode);
         const idToStore = userId || socket.id;
         room.userIds.add(idToStore);
-        if (!room.scores.has(idToStore)) room.scores.set(idToStore, 0);
-        if (!room.answers.has(idToStore)) room.answers.set(idToStore, "");
+        room.scores.set(idToStore, 0);
+        room.answers.set(idToStore, "");
         logActiveRooms(`joined room ${roomCode}`);
       } else {
         console.log(`join rejected for room`, roomCode);
@@ -104,6 +106,8 @@ io.on('connection', socket => {
         console.log('chat message', msg, 'room', roomId);    
         io.to(roomId).emit('chat message', msg); // broadcast to the room only
     });
+
+    
 
     socket.on('disconnect', () => {
       console.log('client disconnected', socket.id);
@@ -144,12 +148,42 @@ io.on('connection', socket => {
       if (!room) return;
       room.question = question;
       logActiveRooms(`set question in room ${roomCode}`)
-    })
+    });
 
     //returns the question that is in room.question
     socket.on('get question', (roomCode, reply) => {
       const room = activeRooms.get(roomCode);
       reply({question: room.question });
     });
+
+    socket.on('set answer', (roomCode, userId, answer) => {
+      const room = activeRooms.get(roomCode);
+      room.answers.set(userId, answer)
+    });
+
+    // get-answer-map(roomCode, reply)
+    // Returns an array of {user: userId, answer: string, id: 1-based index}
+    socket.on('get answer map', (roomCode, reply) => {
+      const room = activeRooms.get(roomCode);
+      const answers = Array.from(room.answers.entries()).map(([user, answer], idx) => ({
+        user,
+        answer,
+        id: idx + 1,
+      }));
+      reply({ ok: true, answers });
+    });
+
+
+    socket.on('set game state', (roomCode, state) => {
+      const room = activeRooms.get(roomCode);
+      room.gameState = state;
+      logActiveRooms(`set state in room ${roomCode}`)
+    });
+
+    socket.on('get game state', (roomCode, reply) => {
+      const room = activeRooms.get(roomCode);
+      reply({gameState: room.gameState});
+    })
+
 
 });

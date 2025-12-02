@@ -18,11 +18,12 @@ const GameRoom = () => {
   const { roomId } = useParams();
   const numberOfUsers: number = 20;
   const [roomValid, setRoomValid] = useState<boolean | null>(null);
-
+/**
   useEffect(() => {
     if (!roomId) return;
     let cancelled = false;
     setRoomValid(null);
+    
     socket.emit("join-lobby", roomId, user?.uid, (res: { ok: boolean }) => {
       if (cancelled) return;
       if (res?.ok) {
@@ -35,9 +36,10 @@ const GameRoom = () => {
     return () => {
       cancelled = true;
       socket.emit("leave-lobby", roomId, user?.uid);
-    };
+    }; 
+    
   }, [roomId, navigate, user?.uid]);
-
+*/
   // state to manage which tab is active on mobile
   // 'participants' or 'chat'
   const [activeTab, setActiveTab] = useState("participants");
@@ -80,12 +82,19 @@ const GameRoom = () => {
     setInput("");
     setMessages(prev => [...prev, msg]);
   }
-  if (loading || roomValid === null) return <div>Loading...</div>;
+
+
+  const setstate = () =>  {
+    socket.emit("set game state", roomId, "hi");
+  };
+
+
+  //if (loading || roomValid === null) return <div>Loading...</div>;
   if (!user) {
     navigate("/login");
     return null;
   }
-  if (roomValid === false) return null;
+  //if (roomValid === false) return null;
 
   return (
     <>
@@ -114,7 +123,7 @@ const GameRoom = () => {
               </div>
             </div>
             {/* Start Game  */}
-            <div className="btn btn-neutral w-50 h-25 hidden md:block">
+            <div className="btn btn-neutral w-50 h-25 hidden md:block" onClick={setstate}>
               <div className="items-center">
                 <p className="text-3xl font-barrio">Start Game</p>
               </div>
