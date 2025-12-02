@@ -17,7 +17,9 @@ const createRoomData = () => ({
     scores: new Map(),
     userIds: new Set(),
     answers: new Map(),
+    question: "",
     gameState: new String,
+    //game states: start, question, answer, finished
 });
 
 const generateRoomCode = () => {
@@ -116,4 +118,38 @@ io.on('connection', socket => {
         }
       }
     });
+
+    //will give the players in players one more point
+    socket.on('add points', (roomCode, players) => {
+      const room = activeRooms.get(roomCode);
+      if (!room) return;
+      for (const playerId of players) {
+        const current = room.scores.get(playerId); 
+        room.scores.set(playerId, current + 1);
+      }
+        logActiveRooms(`added points in room ${roomCode}`);
+      });
+
+    socket.on('reset points', (roomCode, players) => {
+      const room = activeRooms.get(roomCode);
+      if (!room) return;
+      for (const playerId of players) {
+        room.scores.set(playerId, 0);
+      }
+        logActiveRooms(`reset points in room ${roomCode}`);
+      });
+
+    socket.on('set question', (roomCode, question) => {
+      const room = activeRooms.get(roomCode);
+      if (!room) return;
+      room.question = question;
+      logActiveRooms(`set question in room ${roomCode}`)
+    })
+
+    //returns the question that is in room.question
+    socket.on('get question', (roomCode, reply) => {
+      const room = activeRooms.get(roomCode);
+      reply({question: room.question });
+    });
+
 });
