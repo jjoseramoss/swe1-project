@@ -12,12 +12,12 @@ type Message = {
   roomId?: string;
 }
 
-const GameRoom = () => {
-  const { user, loading} = useAuth();
+const GameHostRoom = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { roomId } = useParams();
   const numberOfUsers: number = 20;
-  const [roomValid, setRoomValid] = useState<boolean | null>(null);
+  //const [roomValid, setRoomValid] = useState<boolean | null>(null);
 /**
   useEffect(() => {
     if (!roomId) return;
@@ -243,4 +243,4 @@ const GameRoom = () => {
   );
 };
 
-export default GameRoom;
+export default GameHostRoom;
