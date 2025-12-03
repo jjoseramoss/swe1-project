@@ -6,6 +6,23 @@ import AnswerQuestionForm from '../components/game/AnswerQuestionForm';
 import SelectCorrect from "../components/game/SelectCorrect"
 import Leaderboard from '../components/game/Leaderboard';
 
+//state, userid, component
+//setQ, userid = chosen, makequestionform
+//seQ, userid != chosen, waitingforquestion
+//setA, userid = chosen, waitingforquestion
+//setA, userid != chosen, answerquesitonform
+//setC, userid = chosen, selectcorrect
+//setC, userid != chosen, waitingforquestion
+//viewL, userid, leaderboard
+
+//host clicks button to change game state to setQ again
+
+
+
+
+
+
+
 const GameRoom = () => {
   const { user } = useAuth();
 

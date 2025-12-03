@@ -14,11 +14,13 @@ const io = require('socket.io')(3000, {
 // roomData: { scores: Map<userId, number>, userIds: Set<userId>, answers: Map<userId, string> , gameState: state}
 const activeRooms = new Map();
 const createRoomData = () => ({
-    scores: new Map(),
-    userIds: new Set(),
-    answers: new Map(),
-    question: new String,
-    gameState: new String,
+    scores: new Map(), //userid, score
+    userIds: new Set(), // userid
+    answers: new Map(), // userid, answers
+    chosen: new String, //userid
+    question: new String, //question
+    gameState: new String, //state
+    queue: new Set(), //userid
     //game states: start, question, answer, finished
 });
 
@@ -35,6 +37,8 @@ const logActiveRooms = (label) => {
         userIds: Array.from(data.userIds),
         scores: Array.from(data.scores.entries()),
         answers: Array.from(data.answers.entries()),
+        queue: Array.from(data.queue),
+        chosen: data.chosen,
         question: data.question,
         state: data.gameState,
     }));
@@ -185,7 +189,41 @@ io.on('connection', socket => {
     socket.on('get game state', (roomCode, reply) => {
       const room = activeRooms.get(roomCode);
       reply({gameState: room.gameState});
-    })
+    });
+
+    socket.on('start game', (roomCode) => {
+        const room = activeRooms.get(roomCode);
+        room.state = "setQ";
+        for(const playerId in room.userIds){
+          room.queue.add(playerId);
+        }
+        const first = room.queue.values().next.value;
+        if(first !== undefined) {
+          set.delete(first);
+          room.chosen = first;
+        }
+        else {
+          room.chosen = "";
+        }
+    });
+
+    socket.on('next player', (roomCode) => {
+      const room = activeRooms.get(roomCode);
+      const first = room.queue.values().next.value;
+        if(first !== undefined) {
+          set.delete(first);
+          room.chosen = first;
+        }
+        else {
+          room.chosen = "";
+        }
+    });
+
+    socket.on('get chosen', (roomCode, reply) => {
+      const room = activeRooms.get(roomCode);
+      reply({chosen: room.chosen });
+    });
+
 
 
 });
