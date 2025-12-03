@@ -19,85 +19,87 @@ const GameLobby = () => {
   const numberOfUsers: number = 20;
   const [roomValid, setRoomValid] = useState<boolean | null>(null);
 
-  // useEffect(() => {
-  //   if (!roomId) return;
-  //   let cancelled = false;
-  //   setRoomValid(null);
-  //   socket.emit("join-lobby", roomId, user?.uid, (res: { ok: boolean }) => {
-  //     if (cancelled) return;
-  //     if (res?.ok) {
-  //       setRoomValid(true);
-  //     } else {
-  //       setRoomValid(false);
-  //       navigate("/joinGame", { replace: true });
-  //     }
-  //   });
-  //   return () => {
-  //     cancelled = true;
-  //     socket.emit("leave-lobby", roomId, user?.uid);
-  //   };
-  // }, [roomId, navigate, user?.uid]);
+  useEffect(() => {
+    if (!roomId) return;
+    let cancelled = false;
+    setRoomValid(null);
+    socket.emit("join-lobby", roomId, user?.uid, (res: { ok: boolean }) => {
+      if (cancelled) return;
+      if (res?.ok) {
+        setRoomValid(true);
+      } else {
+        setRoomValid(false);
+        navigate("/joinGame", { replace: true });
+      }
+    });
+    return () => {
+      cancelled = true;
+      socket.emit("leave-lobby", roomId, user?.uid);
+    };
+  }, [roomId, navigate, user?.uid]);
 
-  // // state to manage which tab is active on mobile
-  // // 'participants' or 'chat'
-  // const [activeTab, setActiveTab] = useState("participants");
+  // state to manage which tab is active on mobile
+  // 'participants' or 'chat'
+  const [activeTab, setActiveTab] = useState("participants");
 
-  // // chat state
-  // const [messages, setMessages] = useState<Message[]>([]);
-  // const [input, setInput] = useState("")
-  // const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  // chat state
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("")
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // useEffect(() => {
-  //   //receive messages
-  //   const handler = (msg: Message) => {
-  //     setMessages(prev =>
-  //       prev.some((existing) => existing.id === msg.id) ? prev : [...prev, msg]
-  //     );
-  //   };
-  //   socket.on("chat message", handler);
+  useEffect(() => {
+    //receive messages
+    const handler = (msg: Message) => {
+      setMessages(prev =>
+        prev.some((existing) => existing.id === msg.id) ? prev : [...prev, msg]
+      );
+    };
+    socket.on("chat message", handler);
 
-  //   return () => {
-  //     socket.off("chat message", handler);
-  //   };
-  // }, []);
+    return () => {
+      socket.off("chat message", handler);
+    };
+  }, []);
 
-  // useEffect(() => {
-  //   //scroll to bottom when messages change
-  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth"});
-  // }, [messages]);
+  useEffect(() => {
+    //scroll to bottom when messages change
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth"});
+  }, [messages]);
 
-  // const sendMessage = () => {
-  //   if (!roomId) return;
-  //   if (!input.trim()) return;
-  //   const msg: Message = {
-  //     id: Date.now().toString(),
-  //     sender: user?.displayName, // replace with real username later
-  //     text: input.trim(),
-  //     time: Date.now(),
-  //     roomId
-  //   };
-  //   socket.emit("chat message", msg);
-  //   setInput("");
-  //   setMessages(prev => [...prev, msg]);
-  // }
-  // if (loading || roomValid === null) return <div>Loading...</div>;
-  // if (!user) {
-  //   navigate("/login");
-  //   return null;
-  // }
-  // if (roomValid === false) return null;
+  const sendMessage = () => {
+    if (!roomId) return;
+    if (!input.trim()) return;
+    const msg: Message = {
+      id: Date.now().toString(),
+      sender: user?.displayName, // replace with real username later
+      text: input.trim(),
+      time: Date.now(),
+      roomId
+    };
+    socket.emit("chat message", msg);
+    setInput("");
+    setMessages(prev => [...prev, msg]);
+  }
+  if (loading || roomValid === null) return <div>Loading...</div>;
+  if (!user) {
+    navigate("/login");
+    return null;
+  }
+  if (roomValid === false) return null;
 
   return (
     <>
       <GameNavbar />
-      <div className="w-full h-screen flex flex-col ">
+      <div className="h-screen overflow-hidden flex flex-col bg-base-100">
         {/* Desktop View */}
         {/* Game Pin */}
-        <div className="w-full flex justify-center mt-10">
-          <div className="card w-96 bg-base-100 card-xs shadow-2xl">
-            <div className="card-body text-center">
-              <h2 className="font-excali font-bold text-2xl">Game Pin</h2>
-              <p className="font-bold  text-xl">1234</p>
+        <div className="shrink-0">
+          <div className="w-full flex justify-center mt-10">
+            <div className="card w-96 bg-base-100 card-xs shadow-2xl">
+              <div className="card-body text-center">
+                <h2 className="font-excali font-bold text-2xl">Game Pin</h2>
+                <p className="font-bold  text-xl">1234</p>
+              </div>
             </div>
           </div>
         </div>
@@ -118,12 +120,12 @@ const GameLobby = () => {
         </div>
 
         {/* Chat and Players Components */}
-        <div className="w-full flex justify-around mx-5 mt-5">
+        <div className="min-h-0 pb-30 flex-1 overflow-hidden  flex justify-around mx-5 mt-5">
           {/* Chat */}
           <div
             className={`
-           lg:w-1/4 h-full flex-col
-          card card-lg shadow-xl border bg-gray-300`}
+           lg:w-1/4 flex-col
+          card card-lg shadow-xl border h-full bg-slate-100`}
           >
             <div className="border-b-2 p-4 shrink-0">
               <h1 className="text-4xl font-excali text-center">Chat</h1>
@@ -137,6 +139,30 @@ const GameLobby = () => {
                     <div className="chat-bubble">{m.text}</div>
                 </div>
               ))} */}
+              <div className={`chat chat-start`}>
+                <div className="chat-header">Sender</div>
+                <div className="chat-bubble">Text</div>
+              </div>
+              <div className={`chat chat-start`}>
+                <div className="chat-header">Sender</div>
+                <div className="chat-bubble">Text</div>
+              </div>
+              <div className={`chat chat-start`}>
+                <div className="chat-header">Sender</div>
+                <div className="chat-bubble">Text</div>
+              </div>
+              <div className={`chat chat-start`}>
+                <div className="chat-header">Sender</div>
+                <div className="chat-bubble">Text</div>
+              </div>
+              <div className={`chat chat-start`}>
+                <div className="chat-header">Sender</div>
+                <div className="chat-bubble">Text</div>
+              </div>
+              <div className={`chat chat-start`}>
+                <div className="chat-header">Sender</div>
+                <div className="chat-bubble">Text</div>
+              </div>
               <div className={`chat chat-start`}>
                 <div className="chat-header">Sender</div>
                 <div className="chat-bubble">Text</div>
@@ -164,125 +190,52 @@ const GameLobby = () => {
           </div>
 
           {/* Players */}
-          <div className="w-3/5 h-screen border rounded-xl">
+          <div className="w-3/5 border rounded-xl h-full flex flex-col ">
             <h2 className="text-4xl font-excali text-center p-5 border-b">
               Players
             </h2>
 
-            {/* Player component */}
-            <div className="w-full grid grid-cols-4 gap-5 p-5">
-              <div className="h-[8em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
-                <div className="circle absolute h-[5em] w-[5em] -top-[2.5em] -right-[2.5em] rounded-full bg-[#FF5800] group-hover:scale-[800%] duration-500 z-[-1] op"></div>
+            {/* List of Players */}
+            <div className="flex-1 overflow-y-auto p-5">
+              <div className="grid grid-cols-4 gap-5">
+                 {/* Players Component */}
+                <div className="collapse collapse-arrow shadow-xl h-[6em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
+                  <div className="circle absolute h-[5em] w-[5em] -bottom-[2.5em] -right-[2.5em] rounded-full bg-accent group-hover:scale-[800%] duration-500 z-[-1] op"></div>
+                  <div
+                    onClick={() =>
+                      document.getElementById("my_modal_1").showModal()
+                    }
+                    className="avatar flex justify-between"
+                  >
+                    <div className="w-12 rounded-full">
+                      <img src="https://img.daisyui.com/images/profile/demo/yellingcat@192.webp" />
+                    </div>
+                    {/* Username */}
+                    <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
+                      Jomama
+                    </h1>
+                  </div>
 
-                <button className="text-[0.8em] absolute bottom-[1em] left-[1em] text-[#6C3082] group-hover:text-[white] duration-500">
-                  <span className="relative before:h-[0.16em] before:absolute before:w-full before:content-[''] before:bg-[#6C3082] group-hover:before:bg-[white] duration-300 before:bottom-0 before:left-0">
-                    More Info
-                  </span>
-                  <i className="fa-solid fa-arrow-right"></i>
-                </button>
-
-                <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
-                  HEADING
-                </h1>
-              </div>
-              <div className="h-[8em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
-                <div className="circle absolute h-[5em] w-[5em] -top-[2.5em] -right-[2.5em] rounded-full bg-[#FF5800] group-hover:scale-[800%] duration-500 z-[-1] op"></div>
-
-                <button className="text-[0.8em] absolute bottom-[1em] left-[1em] text-[#6C3082] group-hover:text-[white] duration-500">
-                  <span className="relative before:h-[0.16em] before:absolute before:w-full before:content-[''] before:bg-[#6C3082] group-hover:before:bg-[white] duration-300 before:bottom-0 before:left-0">
-                    More Info
-                  </span>
-                  <i className="fa-solid fa-arrow-right"></i>
-                </button>
-
-                <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
-                  HEADING
-                </h1>
-              </div>
-              <div className="h-[8em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
-                <div className="circle absolute h-[5em] w-[5em] -top-[2.5em] -right-[2.5em] rounded-full bg-[#FF5800] group-hover:scale-[800%] duration-500 z-[-1] op"></div>
-
-                <button className="text-[0.8em] absolute bottom-[1em] left-[1em] text-[#6C3082] group-hover:text-[white] duration-500">
-                  <span className="relative before:h-[0.16em] before:absolute before:w-full before:content-[''] before:bg-[#6C3082] group-hover:before:bg-[white] duration-300 before:bottom-0 before:left-0">
-                    More Info
-                  </span>
-                  <i className="fa-solid fa-arrow-right"></i>
-                </button>
-
-                <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
-                  HEADING
-                </h1>
-              </div>
-              <div className="h-[8em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
-                <div className="circle absolute h-[5em] w-[5em] -top-[2.5em] -right-[2.5em] rounded-full bg-[#FF5800] group-hover:scale-[800%] duration-500 z-[-1] op"></div>
-
-                <button className="text-[0.8em] absolute bottom-[1em] left-[1em] text-[#6C3082] group-hover:text-[white] duration-500">
-                  <span className="relative before:h-[0.16em] before:absolute before:w-full before:content-[''] before:bg-[#6C3082] group-hover:before:bg-[white] duration-300 before:bottom-0 before:left-0">
-                    More Info
-                  </span>
-                  <i className="fa-solid fa-arrow-right"></i>
-                </button>
-
-                <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
-                  HEADING
-                </h1>
-              </div>
-              <div className="h-[8em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
-                <div className="circle absolute h-[5em] w-[5em] -top-[2.5em] -right-[2.5em] rounded-full bg-[#FF5800] group-hover:scale-[800%] duration-500 z-[-1] op"></div>
-
-                <button className="text-[0.8em] absolute bottom-[1em] left-[1em] text-[#6C3082] group-hover:text-[white] duration-500">
-                  <span className="relative before:h-[0.16em] before:absolute before:w-full before:content-[''] before:bg-[#6C3082] group-hover:before:bg-[white] duration-300 before:bottom-0 before:left-0">
-                    More Info
-                  </span>
-                  <i className="fa-solid fa-arrow-right"></i>
-                </button>
-
-                <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
-                  HEADING
-                </h1>
-              </div>
-              <div className="h-[8em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
-                <div className="circle absolute h-[5em] w-[5em] -top-[2.5em] -right-[2.5em] rounded-full bg-[#FF5800] group-hover:scale-[800%] duration-500 z-[-1] op"></div>
-
-                <button className="text-[0.8em] absolute bottom-[1em] left-[1em] text-[#6C3082] group-hover:text-[white] duration-500">
-                  <span className="relative before:h-[0.16em] before:absolute before:w-full before:content-[''] before:bg-[#6C3082] group-hover:before:bg-[white] duration-300 before:bottom-0 before:left-0">
-                    More Info
-                  </span>
-                  <i className="fa-solid fa-arrow-right"></i>
-                </button>
-
-                <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
-                  HEADING
-                </h1>
-              </div>
-              <div className="h-[8em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
-                <div className="circle absolute h-[5em] w-[5em] -top-[2.5em] -right-[2.5em] rounded-full bg-[#FF5800] group-hover:scale-[800%] duration-500 z-[-1] op"></div>
-
-                <button className="text-[0.8em] absolute bottom-[1em] left-[1em] text-[#6C3082] group-hover:text-[white] duration-500">
-                  <span className="relative before:h-[0.16em] before:absolute before:w-full before:content-[''] before:bg-[#6C3082] group-hover:before:bg-[white] duration-300 before:bottom-0 before:left-0">
-                    More Info
-                  </span>
-                  <i className="fa-solid fa-arrow-right"></i>
-                </button>
-
-                <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
-                  HEADING
-                </h1>
-              </div>
-              <div className="h-[8em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
-                <div className="circle absolute h-[5em] w-[5em] -top-[2.5em] -right-[2.5em] rounded-full bg-[#FF5800] group-hover:scale-[800%] duration-500 z-[-1] op"></div>
-
-                <button className="text-[0.8em] absolute bottom-[1em] left-[1em] text-[#6C3082] group-hover:text-[white] duration-500">
-                  <span className="relative before:h-[0.16em] before:absolute before:w-full before:content-[''] before:bg-[#6C3082] group-hover:before:bg-[white] duration-300 before:bottom-0 before:left-0">
-                    More Info
-                  </span>
-                  <i className="fa-solid fa-arrow-right"></i>
-                </button>
-
-                <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
-                  HEADING
-                </h1>
-              </div>
+                  {/* Modal */}
+                  <dialog id="my_modal_1" className="modal">
+                    <div className="modal-box">
+                      <h3 className="font-bold text-lg text-center">Jomama</h3>
+                      <p className="py-4">
+                        <span className="font-bold">Bio: </span>
+                        Press ESC key or click outside to close
+                      </p>
+                      <h3 className="font-bold">Socials:</h3>
+                      <ul className="">
+                        <li>Instagram: @jomama</li>
+                      </ul>
+                    </div>
+                    <form method="dialog" className="modal-backdrop">
+                      <button>close</button>
+                    </form>
+                  </dialog>
+                </div>
+               
+                </div>
             </div>
           </div>
         </div>
