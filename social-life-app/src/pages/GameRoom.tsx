@@ -12,7 +12,7 @@ type Message = {
   roomId?: string;
 }
 
-const GameHostRoom = () => {
+const GameRoom = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { roomId } = useParams();
@@ -243,4 +243,4 @@ const GameHostRoom = () => {
   );
 };
 
-export default GameHostRoom;
+export default GameRoom;
