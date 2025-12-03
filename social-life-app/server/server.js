@@ -108,7 +108,7 @@ io.on('connection', socket => {
     });
 
     
-
+    /** 
     socket.on('disconnect', () => {
       console.log('client disconnected', socket.id);
       // remove socket from any rooms it belonged to
@@ -122,7 +122,7 @@ io.on('connection', socket => {
         }
       }
     });
-
+*/
     //will give the players in players one more point
     socket.on('add points', (roomCode, players) => {
       const room = activeRooms.get(roomCode);
@@ -147,6 +147,7 @@ io.on('connection', socket => {
       const room = activeRooms.get(roomCode);
       if (!room) return;
       room.question = question;
+      io.to(roomCode).emit('question updated', { question });
       logActiveRooms(`set question in room ${roomCode}`)
     });
 
@@ -159,6 +160,7 @@ io.on('connection', socket => {
     socket.on('set answer', (roomCode, userId, answer) => {
       const room = activeRooms.get(roomCode);
       room.answers.set(userId, answer)
+      logActiveRooms(`set answer in room ${roomCode}`);
     });
 
     // get-answer-map(roomCode, reply)

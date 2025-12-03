@@ -21,13 +21,13 @@ const App = () => {
           <Route path="/" element={<Home/>} />
           <Route path="/games" element={<GameHomePage/>} />
           <Route path="/about" element={<About/>} />
-          <Route path="/game/" element={<GameLobby/>}/>
+          <Route path="/game/:roomId" element={<GameLobby/>}/>
           <Route path="/joinGame" element={<JoinGameForm/> }/>
           <Route path="/settings" element={<SettingsPage/>}/>
           <Route path="/login" element={<Login/>}/>
           <Route path="/profile" element={<Profile/>}/>
           <Route path="/signup" element={<Signup/>}/>
-          <Route path="/gameplay" element={<GameRoom/> }/>
+          <Route path="/gameplay/:roomId" element={<GameRoom/> }/>
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
 

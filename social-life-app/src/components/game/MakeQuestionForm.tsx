@@ -1,10 +1,16 @@
 import { useState } from "react";
+import { socket } from "../../lib/socket-io/socket";
+//import { useAuth } from "../../contexts/AuthProvider";
+import { useParams } from "react-router-dom";
+
 
 const MakeQuestionForm = () => {
   const [question, setQuestion] = useState("");
-  
+  const { roomId } = useParams();
+
   const handleSubmit = () => {
     console.log(question)
+    socket.emit('set question' , roomId, question);
   }
 
   return (

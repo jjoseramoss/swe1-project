@@ -1,12 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { socket } from "../../lib/socket-io/socket";
+import { useAuth } from "../../contexts/AuthProvider";
+import { useParams } from "react-router-dom";
+
 
 const AnswerQuestionForm = () => {
+  const { user } = useAuth();
+  const { roomId } = useParams();
   const [answer, setAnswer] = useState("");
-  const question = "What is my favorite color??"
+  const [question, setQuestion] = useState<string>("Temp");
   const questionUser = "Jomama"
+
+  useEffect(() => {
+    const handleQuestion = ({question}: {question: string}) => setQuestion(question);
+    socket.on("question updated", handleQuestion)
+  })
+
+
+
+
+
   const handleSubmit = () => {
     console.log(answer)
+    socket.emit('set answer', roomId, user?.uid, answer);
   }
+
 
   return (
     <div className="w-full min-h-screen flex justify-center items-start bg-base-content py-8">
