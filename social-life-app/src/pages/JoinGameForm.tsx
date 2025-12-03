@@ -21,6 +21,7 @@ const JoinGameForm = () => {
   }
 
   const isValid = (gameID.length === REQUIRED_LENGTH);
+  const reply = " ";
 
   const handleJoin = () => {
     if (!isValid || isChecking) return;
@@ -29,6 +30,7 @@ const JoinGameForm = () => {
     socket.emit("validate-room-code", gameID, (res: { ok: boolean }) => {
       setIsChecking(false);
       if (res?.ok) {
+        socket.emit('join-lobby', gameID, user, reply);
         navigate(`/game/${gameID}`);
       } else {
         setError("Room not found or inactive.");
