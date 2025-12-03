@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Barrio&family=Be+Vietnam+Pro:wght@400;500;700&family=Fascinate&display=swap');
 
+
+@font-face {
+  font-family: excali;
+  src: url("../src/assets/fonts/Excalifont-Regular.woff2")
+}
+
+
 @import "tailwindcss";
 @plugin "daisyui"{
   themes: light --default, dark --prefersdark, cupcake, forest, retro;
@@ -9,5 +16,6 @@
   --font-barrio: "Barrio", cursive;
   --font-vietnam: "Be Vietnam Pro", sans-serif;
   --font-fascinate: "Fascinate", cursive;
+  --font-excali: excali, "sans-serif"
 }
 

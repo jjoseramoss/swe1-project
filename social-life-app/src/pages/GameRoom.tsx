@@ -1,16 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { socket } from "../lib/socket-io/socket";
-import GameNavbar from "../components/common/GameNavbar";
+import GameNavbar from '../components/common/GameNavbar'
 import { useAuth } from "../contexts/AuthProvider";
-
-type Message = {
-  id: string;
-  sender?: string;
-  text: string;
-  time?: number;
-  roomId?: string;
-}
+import WaitingForQuestion from '../components/game/WaitingForQuestion';
+import MakeQuestionForm from '../components/game/MakeQuestionForm';
+import AnswerQuestionForm from '../components/game/AnswerQuestionForm';
+import SelectCorrect from "../components/game/SelectCorrect"
+import Leaderboard from '../components/game/Leaderboard';
 
 const GameRoom = () => {
   const { user } = useAuth();
@@ -240,7 +234,7 @@ const GameRoom = () => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default GameRoom;
+export default GameRoom

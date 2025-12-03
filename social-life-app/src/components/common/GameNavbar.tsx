@@ -73,7 +73,7 @@ const GameNavbar = () => {
         </div>
 
         {/* Logo */}
-        <Link to="/" className="btn btn-ghost text-xl font-fascinate ml-1">
+        <Link to="/" className="btn btn-ghost text-xl font-excali ml-1">
           WHO KNOWS ME?!
         </Link>
       </div>
@@ -82,7 +82,7 @@ const GameNavbar = () => {
       <div className="navbar-center hidden md:flex">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <Link to="/joingame" className="btn btn-neutral font-fascinate">
+            <Link to="/joingame" className="btn btn-neutral font-excali">
               Join Game
             </Link>
           </li>
@@ -138,7 +138,7 @@ const GameNavbar = () => {
       <div className="navbar-end md:hidden">
         <Link
           to="/joingame"
-          className="btn btn-sm btn-neutral mr-2 font-fascinate"
+          className="btn btn-sm btn-neutral mr-2 font-excali"
         >
           Join Game
         </Link>
