@@ -22,7 +22,7 @@ const Home = () => {
             <div className="shrink-0 relative">
               <div className="absolute -inset-2 bg-accent rounded-full blur opacity-40 animate-pulse"></div>
               <img
-                src="../public/wkme-home-banner.jpg"
+                src="/wkme-home-banner.jpg"
                 className="max-w-xs md:max-w-sm rounded-badge shadow-2xl border-4 border-base-100 relative z-10"
                 alt="Who Knows Me Game Banner"
               />
