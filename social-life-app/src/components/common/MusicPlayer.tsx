@@ -105,7 +105,7 @@ const MusicPlayer = () => {
   };
 
   return (
-    <div className="absolute bottom-0 right-0 p-2 mr-4 hidden md:inline-block ">
+    <div className="fixed bottom-0 right-0 p-2 mr-4 hidden md:inline-block ">
       <audio
         loop
         src={`../src/assets/music/${songs[currentSong].url}`}
