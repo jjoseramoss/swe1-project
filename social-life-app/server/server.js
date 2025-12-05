@@ -53,7 +53,7 @@ io.on('connection', socket => {
       if (exists) {
         socket.join(roomCode);
         const users = activeRooms.get(roomCode);
-        const idToStore = userId || socket.id;
+        const idToStore = userId || socket.id; //should only be userId since users should be logged in.
         users?.add(idToStore);
         logActiveRooms(`joined room ${roomCode}`);
       } else {
