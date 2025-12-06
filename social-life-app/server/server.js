@@ -14,13 +14,15 @@ const io = require('socket.io')(3000, {
 // roomData: { scores: Map<userId, number>, userIds: Set<userId>, answers: Map<userId, string> , gameState: state}
 const activeRooms = new Map();
 const createRoomData = () => ({
-    scores: new Map(), //userid, score
     userIds: new Set(), // userid
+    scores: new Map(), //userid, score
     answers: new Map(), // userid, answers
+    names: new Map(), // userid, name
     chosen: new String, //userid
     question: new String, //question
     gameState: new String, //state
     queue: new Set(), //userid
+
     //game states: start, question, answer, finished
 });
 
@@ -37,6 +39,7 @@ const logActiveRooms = (label) => {
         userIds: Array.from(data.userIds),
         scores: Array.from(data.scores.entries()),
         answers: Array.from(data.answers.entries()),
+        names: Array.from(data.names.entries()),
         queue: Array.from(data.queue),
         chosen: data.chosen,
         question: data.question,
@@ -65,7 +68,7 @@ io.on('connection', socket => {
     });
     
     // join-lobby(roomCode, userId?, reply?)
-    socket.on("join-lobby", (roomCode, maybeUserId, maybeReply) => {
+    socket.on("join-lobby", (roomCode, maybeUserId, userName, maybeReply) => {
       const userId = typeof maybeUserId === 'string' ? maybeUserId : undefined;
       const reply = typeof maybeUserId === 'function' ? maybeUserId : (typeof maybeReply === 'function' ? maybeReply : undefined);
       const room = activeRooms.get(roomCode);
@@ -76,6 +79,7 @@ io.on('connection', socket => {
         room.userIds.add(idToStore);
         room.scores.set(idToStore, 0);
         room.answers.set(idToStore, "");
+        room.names.set(idToStore, userName);
         logActiveRooms(`joined room ${roomCode}`);
       } else {
         console.log(`join rejected for room`, roomCode);
@@ -127,8 +131,9 @@ io.on('connection', socket => {
       }
     });
 */
+
     //will give the players in players one more point
-    socket.on('add points', (roomCode, players) => {
+    socket.on('add-points', (roomCode, players) => {
       const room = activeRooms.get(roomCode);
       if (!room) return;
       for (const playerId of players) {
@@ -138,7 +143,7 @@ io.on('connection', socket => {
         logActiveRooms(`added points in room ${roomCode}`);
       });
 
-    socket.on('reset points', (roomCode, players) => {
+    socket.on('reset-points', (roomCode, players) => {
       const room = activeRooms.get(roomCode);
       if (!room) return;
       for (const playerId of players) {
@@ -147,51 +152,73 @@ io.on('connection', socket => {
         logActiveRooms(`reset points in room ${roomCode}`);
       });
 
-    socket.on('set question', (roomCode, question) => {
+    socket.on('set-question', (roomCode, question) => {
       const room = activeRooms.get(roomCode);
       if (!room) return;
       room.question = question;
-      io.to(roomCode).emit('question updated', { question });
+      io.to(roomCode).emit('question-updated', { question });
       logActiveRooms(`set question in room ${roomCode}`)
     });
 
     //returns the question that is in room.question
-    socket.on('get question', (roomCode, reply) => {
+    socket.on('get-question', (roomCode, reply) => {
       const room = activeRooms.get(roomCode);
       reply({question: room.question });
     });
 
-    socket.on('set answer', (roomCode, userId, answer) => {
+    socket.on('set-answer', (roomCode, userId, answer) => {
       const room = activeRooms.get(roomCode);
       room.answers.set(userId, answer)
       logActiveRooms(`set answer in room ${roomCode}`);
     });
 
-    // get-answer-map(roomCode, reply)
-    // Returns an array of {user: userId, answer: string, id: 1-based index}
-    socket.on('get answer map', (roomCode, reply) => {
+    socket.on('get-answer', (roomCode, userId, reply) => {
       const room = activeRooms.get(roomCode);
-      const answers = Array.from(room.answers.entries()).map(([user, answer], idx) => ({
-        user,
+      reply({answer: room.answers.get(userId)});
+    });
+
+    socket.on('get-name', (roomCode, userId, reply) => {
+      const room = activeRooms.get(roomCode);
+      reply({name: room.names.get(userId)});
+    });
+
+    socket.on('get-answer-map', (roomCode, reply) => {
+      if (typeof reply !== 'function') return;
+      const room = activeRooms.get(roomCode);
+      if (!room) {
+        reply({ ok: false, answers: [] });
+        return;
+      }
+      const answers = Array.from(room.answers.entries()).map(([userId, answer]) => ({
+        user: room.names.get(userId) || "",
         answer,
-        id: idx + 1,
+        id: userId,
       }));
       reply({ ok: true, answers });
     });
 
-
-    socket.on('set game state', (roomCode, state) => {
+    socket.on('set-game-state', (roomCode, state) => {
       const room = activeRooms.get(roomCode);
       room.gameState = state;
       logActiveRooms(`set state in room ${roomCode}`)
     });
 
-    socket.on('get game state', (roomCode, reply) => {
+    socket.on('get-game-state', (roomCode, reply) => {
       const room = activeRooms.get(roomCode);
       reply({gameState: room.gameState});
     });
 
-    socket.on('start game', (roomCode) => {
+    socket.on('get-users', (roomCode, reply) => {
+      if (typeof reply !== 'function') return;
+      const room = activeRooms.get(roomCode);
+      if (!room) {
+        reply({ ok: false, users: [] });
+        return;
+      }
+      reply({ ok: true, users: Array.from(room.userIds) });
+    });
+
+    socket.on('start-game', (roomCode) => {
         const room = activeRooms.get(roomCode);
         room.state = "setQ";
         for(const playerId in room.userIds){
@@ -207,7 +234,7 @@ io.on('connection', socket => {
         }
     });
 
-    socket.on('next player', (roomCode) => {
+    socket.on('next-player', (roomCode) => {
       const room = activeRooms.get(roomCode);
       const first = room.queue.values().next.value;
         if(first !== undefined) {
@@ -219,7 +246,7 @@ io.on('connection', socket => {
         }
     });
 
-    socket.on('get chosen', (roomCode, reply) => {
+    socket.on('get-chosen', (roomCode, reply) => {
       const room = activeRooms.get(roomCode);
       reply({chosen: room.chosen });
     });

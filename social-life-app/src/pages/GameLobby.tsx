@@ -80,7 +80,7 @@ const GameLobby = () => {
     setInput("");
     setMessages(prev => [...prev, msg]);
   }
-  if (loading || roomValid === null) return <div>Loading...</div>;
+  if (loading ) return <div>Loading...</div>;
   if (!user) {
     navigate("/login");
     return null;
@@ -98,7 +98,7 @@ const GameLobby = () => {
             <div className="card w-96 bg-base-100 card-xs shadow-2xl">
               <div className="card-body text-center">
                 <h2 className="font-excali font-bold text-2xl">Game Pin</h2>
-                <p className="font-bold  text-xl">1234</p>
+                <p className="font-bold  text-xl">{roomId}</p>
               </div>
             </div>
           </div>

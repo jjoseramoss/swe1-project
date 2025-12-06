@@ -13,7 +13,7 @@ import Leaderboard from '../components/game/Leaderboard';
 //setA, userid != chosen, answerquesitonform
 //setC, userid = chosen, selectcorrect
 //setC, userid != chosen, waitingforquestion
-//viewL, userid, leaderboard
+//viewL, leaderboard
 
 //host clicks button to change game state to setQ again
 

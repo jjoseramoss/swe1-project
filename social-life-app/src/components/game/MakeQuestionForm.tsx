@@ -10,7 +10,8 @@ const MakeQuestionForm = () => {
 
   const handleSubmit = () => {
     console.log(question)
-    socket.emit('set question' , roomId, question);
+    socket.emit('set-question' , roomId, question);
+    socket.emit('set-game-state')
   }
 
   return (
