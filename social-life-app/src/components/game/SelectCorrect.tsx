@@ -1,49 +1,22 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
-import { socket } from "../../lib/socket-io/socket";
-import { useAuth } from "../../contexts/AuthProvider";
-import { useParams } from "react-router-dom";
+
+const options = [
+    {user: 'jose', answer:'The answer is blue', id:1},
+    {user: 'efren', answer:'The answer is blueThe answer is blue', id:2},
+    {user: 'victor', answer:'The answer is blueThe answer is blueThe answer is blue', id:3},
+    {user: 'john', answer:'The answer is blue', id:4}
+    
+]
 
 const randomAngle = (min = -5, max = 5) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
-type Option = { user: string; answer: string; id: string };
-
 const SelectCorrect = () => {
-  const { user } = useAuth();
-  const { roomId } = useParams();
-  const [answers, setAnswer] = useState<Option[]>([]);
-
-  const questionUser = user?.displayName; // change to current user
-  const angles = useMemo(() => answers.map(() => randomAngle()), [answers.length]);
+  const questionUser = "Jomama"; // change to current user
+  const angles = useMemo(() => options.map(() => randomAngle()), []);
 
   const [correctUsers, setCorrectUsers] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!roomId) return;
-
-    socket.emit(
-      "get-answer-map",
-      roomId,
-      (res: { ok: boolean; answers?: { user: string; answer: string; id: string }[] }) => {
-        if (!res?.ok || !Array.isArray(res.answers)) return;
-
-        const next = res.answers.map(a => ({
-          user: a.user ?? "",
-          answer: a.answer ?? "",
-          id: a.id,
-        }));
-
-        setAnswer(prev => {
-          const sameLength = prev.length === next.length;
-          const same =
-            sameLength &&
-            prev.every((p, i) => p.id === next[i].id && p.user === next[i].user && p.answer === next[i].answer);
-          return same ? prev : next;
-        });
-      }
-    );
-  }, [roomId]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
@@ -58,9 +31,8 @@ const SelectCorrect = () => {
   };
 
   const handleSubmit = () => {
+    console.log(correctUsers)
   }
-
-  
 
 
   return (
@@ -72,7 +44,7 @@ const SelectCorrect = () => {
         <p className="text-primary-content text-center font-excali text-5xl">Select Correct Answers</p>
 
         <ul className="grid grid-cols-1 gap-4  mt-10">
-            {answers.map((opt, idx) => (
+            {options.map((opt, idx) => (
                 <li 
                 key={opt.id} 
                 style={{
