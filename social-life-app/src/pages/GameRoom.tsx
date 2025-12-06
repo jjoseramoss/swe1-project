@@ -21,18 +21,6 @@ import { socket } from "../lib/socket-io/socket";
 
 //host clicks button to change game state to setQ again
 
-
-//state, userid, component
-//setQ, userid = chosen, makequestionform
-//seQ, userid != chosen, waitingforquestion
-//setA, userid = chosen, waitingforquestion
-//setA, userid != chosen, answerquesitonform
-//setC, userid = chosen, selectcorrect
-//setC, userid != chosen, waitingforquestion
-//viewL, userid, leaderboard
-
-//host clicks button to change game state to setQ again
-
 const GameRoom = () => {
   const { user } = useAuth();
   const { roomId } = useParams();
@@ -43,13 +31,28 @@ const GameRoom = () => {
   useEffect(() => {
     if (!roomId) return;
 
-    socket.emit('get-chosen', roomId, (reply: { ok?: boolean; chosen: string }) => {
-      if (reply?.ok && typeof reply.chosen === "string") setChosen(reply.chosen);
-    });
+    const refreshState = () => {
+      socket.emit('get-chosen', roomId, (reply: { ok?: boolean; chosen?: string }) => {
+        if (reply?.ok && typeof reply.chosen === "string") setChosen(reply.chosen);
+      });
 
-    socket.emit('get-game-state', roomId, (reply: { gameState: string }) => {
-      if (typeof reply?.gameState === "string") setGameState(reply.gameState);
-    });
+      socket.emit('get-game-state', roomId, (reply: { gameState?: string }) => {
+        if (typeof reply?.gameState === "string") setGameState(reply.gameState);
+      });
+    };
+
+    const handleGameStateUpdated = (payload: { gameState?: string }) => {
+      if (typeof payload?.gameState === "string") setGameState(payload.gameState);
+      refreshState(); // keep chosen/gameState in sync when server pushes updates
+    };
+
+    socket.on('game-state-updated', handleGameStateUpdated);
+
+    refreshState(); // initial fetch on join
+
+    return () => {
+      socket.off('game-state-updated', handleGameStateUpdated);
+    };
   }, [roomId]);
 
   const renderGameContent = () => {
@@ -57,6 +60,7 @@ const GameRoom = () => {
 
     switch (gameState) {
       case "setQ":
+      case "seQ":
         return isChosen ? <MakeQuestionForm /> : <WaitingForQuestion />;
       case "setA":
         return isChosen ? <WaitingForQuestion /> : <AnswerQuestionForm />;

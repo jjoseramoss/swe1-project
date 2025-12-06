@@ -20,6 +20,14 @@ const JoinGameForm = () => {
     setGameID(digits);
   }
 
+  const profile = user
+      ? {
+          uid: user.uid,
+          displayName: user.displayName,
+          avatarUrl: user.avatarUrl,
+        }
+      : undefined;
+
   const isValid = (gameID.length === REQUIRED_LENGTH);
   const reply = " ";
 
@@ -30,8 +38,8 @@ const JoinGameForm = () => {
     socket.emit("validate-room-code", gameID, (res: { ok: boolean }) => {
       setIsChecking(false);
       if (res?.ok) {
-        socket.emit('join-lobby', gameID, user, reply);
-        navigate(`/game/${gameID}`);
+        socket.emit('join-lobby', gameID, profile, reply);
+        navigate(`/gameplay/${gameID}`);
       } else {
         setError("Room not found or inactive.");
       }

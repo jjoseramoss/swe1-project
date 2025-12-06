@@ -1,10 +1,16 @@
-//import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { socket } from "../lib/socket-io/socket";
 import GameNavbar from "../components/common/GameNavbar";
 import { useAuth } from "../contexts/AuthProvider";
 
-
+type Message = {
+  id: string;
+  sender?: string;
+  text: string;
+  time?: number;
+  roomId?: string;
+};
 
 const GameLobby = () => {
   const { user, loading } = useAuth();
@@ -14,23 +20,7 @@ const GameLobby = () => {
     { uid: string; displayName?: string; avatarUrl?: string }[]
   >([]);
 
-  useEffect(() => {
-    if (!roomId) return;
-    let cancelled = false;
-    //sends full profile object istead of only uid
-    const profile = user
-      ? {
-          uid: user.uid,
-          displayName: user.displayName,
-          avatarUrl: user.avatarUrl,
-        }
-      : undefined;
-    });
-    return () => {
-      cancelled = true;
-      socket.emit("leave-lobby", roomId, user?.uid);
-    };
-  }, [roomId, navigate, user, user?.uid, user?.displayName, user?.avatarUrl]);
+
 
   //Listen for lobby updates from server
   useEffect(() => {
@@ -84,11 +74,11 @@ const GameLobby = () => {
     setInput("");
     setMessages((prev) => [...prev, msg]);
   };
-  if (loading || roomValid === null) return <div>Loading...</div>;
+  if (loading) return <div>Loading...</div>;
   if (!user) {
     navigate("/login");
     return null;
-  }
+  };
 
   const startGame = () =>{
     socket.emit('start-game', roomId);
