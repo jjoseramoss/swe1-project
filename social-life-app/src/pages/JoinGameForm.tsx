@@ -30,8 +30,8 @@ const JoinGameForm = () => {
     socket.emit("validate-room-code", gameID, (res: { ok: boolean }) => {
       setIsChecking(false);
       if (res?.ok) {
-        socket.emit('join-lobby', gameID, user?.uid, reply);
-        navigate(`/gameplay/${gameID}`);
+        socket.emit('join-lobby', gameID, user, reply);
+        navigate(`/game/${gameID}`);
       } else {
         setError("Room not found or inactive.");
       }

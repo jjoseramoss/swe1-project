@@ -16,14 +16,24 @@ const GameLobby = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const numberOfUsers: number = 20;
   const [roomValid, setRoomValid] = useState<boolean | null>(null);
+  const [participants, setParticipants] = useState<
+    { uid: string; displayName?: string; avatarUrl?: string }[]
+  >([]);
 
   useEffect(() => {
     if (!roomId) return;
     let cancelled = false;
     setRoomValid(null);
-    socket.emit("join-lobby", roomId, user?.uid, (res: { ok: boolean }) => {
+    //sends full profile object istead of only uid
+    const profile = user
+      ? {
+          uid: user.uid,
+          displayName: user.displayName,
+          avatarUrl: user.avatarUrl,
+        }
+      : undefined;
+    socket.emit("join-lobby", roomId, profile, (res: { ok: boolean }) => {
       if (cancelled) return;
       if (res?.ok) {
         setRoomValid(true);
@@ -36,21 +46,31 @@ const GameLobby = () => {
       cancelled = true;
       socket.emit("leave-lobby", roomId, user?.uid);
     };
-  }, [roomId, navigate, user?.uid]);
+  }, [roomId, navigate, user, user?.uid, user?.displayName, user?.avatarUrl]);
 
+  //Listen for lobby updates from server
+  useEffect(() => {
+    const handler = (payload: { participants: any[] }) => {
+      setParticipants(payload.participants || []);
+    };
+    socket.on("lobby:update", handler);
+    return () => {
+      socket.off("lobby:update", handler);
+    };
+  });
   // state to manage which tab is active on mobile
   // 'participants' or 'chat'
-  const [activeTab, setActiveTab] = useState("participants");
+  //const [activeTab, setActiveTab] = useState("participants");
 
   // chat state
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("")
+  const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     //receive messages
     const handler = (msg: Message) => {
-      setMessages(prev =>
+      setMessages((prev) =>
         prev.some((existing) => existing.id === msg.id) ? prev : [...prev, msg]
       );
     };
@@ -63,7 +83,7 @@ const GameLobby = () => {
 
   useEffect(() => {
     //scroll to bottom when messages change
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth"});
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const sendMessage = () => {
@@ -74,12 +94,12 @@ const GameLobby = () => {
       sender: user?.displayName, // replace with real username later
       text: input.trim(),
       time: Date.now(),
-      roomId
+      roomId,
     };
     socket.emit("chat message", msg);
     setInput("");
-    setMessages(prev => [...prev, msg]);
-  }
+    setMessages((prev) => [...prev, msg]);
+  };
   if (loading || roomValid === null) return <div>Loading...</div>;
   if (!user) {
     navigate("/login");
@@ -133,59 +153,35 @@ const GameLobby = () => {
 
             {/* Messages (dynamic) */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {/* {messages.map((m) => (
-                <div key={m.id} className={`chat ${m.sender === "You" ? "chat-end" : "chat-start"}`}>
-                    <div className="chat-header">{m.sender}</div>
-                    <div className="chat-bubble">{m.text}</div>
+              {messages.map((m) => (
+                <div
+                  key={m.id}
+                  className={`chat ${
+                    m.sender === user.displayName ? "chat-end" : "chat-start"
+                  }`}
+                >
+                  <div className="chat-header">{m.sender}</div>
+                  <div className="chat-bubble">{m.text}</div>
                 </div>
-              ))} */}
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
+              ))}
+
               <div />
             </div>
             {/* Controls */}
             <div className="flex p-4 border-t  shrink-0">
               <input
-                value=""
+                onChange={(e) => setInput(e.target.value)}
+                value={input}
                 className="input border-base-300 w-full mr-2 text-end"
                 placeholder="Type Here"
                 type="text"
               />
-              <button className=" btn btn-info text-white">Send</button>
+              <button
+                onClick={sendMessage}
+                className=" btn btn-info text-white"
+              >
+                Send
+              </button>
             </div>
           </div>
 
@@ -196,47 +192,43 @@ const GameLobby = () => {
             </h2>
 
             {/* List of Players */}
-            <div className="flex-1 overflow-y-auto p-5">
-              <div className="grid grid-cols-4 gap-5">
-                 {/* Players Component */}
-                <div className="collapse collapse-arrow shadow-xl h-[6em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
-                  <div className="circle absolute h-[5em] w-[5em] -bottom-[2.5em] -right-[2.5em] rounded-full bg-accent group-hover:scale-[800%] duration-500 z-[-1] op"></div>
-                  <div
-                    onClick={() =>
-                      document.getElementById("my_modal_1").showModal()
-                    }
-                    className="avatar flex justify-between"
-                  >
-                    <div className="w-12 rounded-full">
-                      <img src="https://img.daisyui.com/images/profile/demo/yellingcat@192.webp" />
-                    </div>
-                    {/* Username */}
-                    <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
-                      Jomama
-                    </h1>
+            {participants.map((p, idx) => (
+              <div className="collapse collapse-arrow shadow-xl h-[6em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
+                <div className="circle absolute h-[5em] w-[5em] -bottom-[2.5em] -right-[2.5em] rounded-full bg-accent group-hover:scale-[800%] duration-500 z-[-1] op"></div>
+                <div
+                  onClick={() =>
+                    document.getElementById(`modal_${idx}`).showModal()
+                  }
+                  className="avatar flex justify-between"
+                >
+                  <div className="w-12 rounded-full">
+                    <img src={`/avatars/${p.avatarUrl}`} />
                   </div>
+                  {/* Username */}
+                  <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
+                    {p.displayName}
+                  </h1>
+                </div>
 
-                  {/* Modal */}
-                  <dialog id="my_modal_1" className="modal">
-                    <div className="modal-box">
-                      <h3 className="font-bold text-lg text-center">Jomama</h3>
-                      <p className="py-4">
-                        <span className="font-bold">Bio: </span>
-                        Press ESC key or click outside to close
-                      </p>
-                      <h3 className="font-bold">Socials:</h3>
-                      <ul className="">
-                        <li>Instagram: @jomama</li>
-                      </ul>
-                    </div>
-                    <form method="dialog" className="modal-backdrop">
-                      <button>close</button>
-                    </form>
-                  </dialog>
-                </div>
-               
-                </div>
-            </div>
+                {/* Modal */}
+                <dialog id={`modal_${idx}`} className="modal">
+                  <div className="modal-box">
+                    <h3 className="font-bold text-lg text-center">{p.displayName}</h3>
+                    <p className="py-4">
+                      <span className="font-bold">Bio: </span>
+                      Press ESC key or click outside to close
+                    </p>
+                    <h3 className="font-bold">Socials:</h3>
+                    <ul className="">
+                      <li>Instagram: @jomama</li>
+                    </ul>
+                  </div>
+                  <form method="dialog" className="modal-backdrop">
+                    <button>close</button>
+                  </form>
+                </dialog>
+              </div>
+            ))}
           </div>
         </div>
       </div>
