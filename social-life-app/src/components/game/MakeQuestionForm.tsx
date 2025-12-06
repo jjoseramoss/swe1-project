@@ -11,8 +11,8 @@ const MakeQuestionForm = () => {
   const handleSubmit = () => {
     console.log(question)
     socket.emit('set-question' , roomId, question);
-    socket.emit('set-game-state')
-  }
+    socket.emit('set-game-state', roomId, "setA");
+  };
 
   return (
     <div className="w-full min-h-screen flex justify-center items-start bg-base-content py-8">

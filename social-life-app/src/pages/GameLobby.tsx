@@ -1,91 +1,26 @@
-import { useEffect, useRef, useState } from "react";
+//import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { socket } from "../lib/socket-io/socket";
 import GameNavbar from "../components/common/GameNavbar";
 import { useAuth } from "../contexts/AuthProvider";
 
-type Message = {
-  id: string;
-  sender?: string;
-  text: string;
-  time?: number;
-  roomId?: string;
-};
+
 
 const GameLobby = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const numberOfUsers: number = 20;
-  const [roomValid, setRoomValid] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    if (!roomId) return;
-    let cancelled = false;
-    setRoomValid(null);
-    socket.emit("join-lobby", roomId, user?.uid, (res: { ok: boolean }) => {
-      if (cancelled) return;
-      if (res?.ok) {
-        setRoomValid(true);
-      } else {
-        setRoomValid(false);
-        navigate("/joinGame", { replace: true });
-      }
-    });
-    return () => {
-      cancelled = true;
-      socket.emit("leave-lobby", roomId, user?.uid);
-    };
-  }, [roomId, navigate, user?.uid]);
 
-  // state to manage which tab is active on mobile
-  // 'participants' or 'chat'
-  const [activeTab, setActiveTab] = useState("participants");
-
-  // chat state
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("")
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    //receive messages
-    const handler = (msg: Message) => {
-      setMessages(prev =>
-        prev.some((existing) => existing.id === msg.id) ? prev : [...prev, msg]
-      );
-    };
-    socket.on("chat message", handler);
-
-    return () => {
-      socket.off("chat message", handler);
-    };
-  }, []);
-
-  useEffect(() => {
-    //scroll to bottom when messages change
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth"});
-  }, [messages]);
-
-  const sendMessage = () => {
-    if (!roomId) return;
-    if (!input.trim()) return;
-    const msg: Message = {
-      id: Date.now().toString(),
-      sender: user?.displayName, // replace with real username later
-      text: input.trim(),
-      time: Date.now(),
-      roomId
-    };
-    socket.emit("chat message", msg);
-    setInput("");
-    setMessages(prev => [...prev, msg]);
-  }
   if (loading ) return <div>Loading...</div>;
   if (!user) {
     navigate("/login");
     return null;
   }
-  if (roomValid === false) return null;
+
+  const startGame = () =>{
+    socket.emit('start-game', roomId);
+  };
 
   return (
     <>
@@ -113,7 +48,7 @@ const GameLobby = () => {
           </div>
           {/* Controls */}
           <div className="w-1/6">
-            <button className="btn btn-block bg-accent text-xl font-excali p-6">
+            <button className="btn btn-block bg-accent text-xl font-excali p-6" onClick={startGame}>
               Start Game
             </button>
           </div>
@@ -121,73 +56,7 @@ const GameLobby = () => {
 
         {/* Chat and Players Components */}
         <div className="min-h-0 pb-30 flex-1 overflow-hidden  flex justify-around mx-5 mt-5">
-          {/* Chat */}
-          <div
-            className={`
-           lg:w-1/4 flex-col
-          card card-lg shadow-xl border h-full bg-slate-100`}
-          >
-            <div className="border-b-2 p-4 shrink-0">
-              <h1 className="text-4xl font-excali text-center">Chat</h1>
-            </div>
-
-            {/* Messages (dynamic) */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {/* {messages.map((m) => (
-                <div key={m.id} className={`chat ${m.sender === "You" ? "chat-end" : "chat-start"}`}>
-                    <div className="chat-header">{m.sender}</div>
-                    <div className="chat-bubble">{m.text}</div>
-                </div>
-              ))} */}
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div className={`chat chat-start`}>
-                <div className="chat-header">Sender</div>
-                <div className="chat-bubble">Text</div>
-              </div>
-              <div />
-            </div>
-            {/* Controls */}
-            <div className="flex p-4 border-t  shrink-0">
-              <input
-                value=""
-                className="input border-base-300 w-full mr-2 text-end"
-                placeholder="Type Here"
-                type="text"
-              />
-              <button className=" btn btn-info text-white">Send</button>
-            </div>
-          </div>
+          
 
           {/* Players */}
           <div className="w-3/5 border rounded-xl h-full flex flex-col ">
@@ -202,9 +71,12 @@ const GameLobby = () => {
                 <div className="collapse collapse-arrow shadow-xl h-[6em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
                   <div className="circle absolute h-[5em] w-[5em] -bottom-[2.5em] -right-[2.5em] rounded-full bg-accent group-hover:scale-[800%] duration-500 z-[-1] op"></div>
                   <div
-                    onClick={() =>
-                      document.getElementById("my_modal_1").showModal()
-                    }
+                    onClick={() => {
+                      const modal = document.getElementById("my_modal_1") as HTMLDialogElement | null;
+                      if (modal) {
+                        modal.showModal();
+                      }
+                    }}
                     className="avatar flex justify-between"
                   >
                     <div className="w-12 rounded-full">

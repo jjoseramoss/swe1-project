@@ -80,6 +80,7 @@ io.on('connection', socket => {
         room.scores.set(idToStore, 0);
         room.answers.set(idToStore, "");
         room.names.set(idToStore, userName);
+        room.chosen = "";
         logActiveRooms(`joined room ${roomCode}`);
       } else {
         console.log(`join rejected for room`, roomCode);
@@ -156,8 +157,8 @@ io.on('connection', socket => {
       const room = activeRooms.get(roomCode);
       if (!room) return;
       room.question = question;
-      io.to(roomCode).emit('question-updated', { question });
-      logActiveRooms(`set question in room ${roomCode}`)
+      room.gameState = 'setA';      
+      logActiveRooms(`set question in room ${roomCode}`);
     });
 
     //returns the question that is in room.question
@@ -169,6 +170,7 @@ io.on('connection', socket => {
     socket.on('set-answer', (roomCode, userId, answer) => {
       const room = activeRooms.get(roomCode);
       room.answers.set(userId, answer)
+      room.gameState
       logActiveRooms(`set answer in room ${roomCode}`);
     });
 
@@ -200,12 +202,12 @@ io.on('connection', socket => {
     socket.on('set-game-state', (roomCode, state) => {
       const room = activeRooms.get(roomCode);
       room.gameState = state;
-      logActiveRooms(`set state in room ${roomCode}`)
+      logActiveRooms(`set state in room ${roomCode}`);
     });
 
     socket.on('get-game-state', (roomCode, reply) => {
       const room = activeRooms.get(roomCode);
-      reply({gameState: room.gameState});
+      reply({ok: true, gameState: room.gameState});
     });
 
     socket.on('get-users', (roomCode, reply) => {
@@ -220,18 +222,18 @@ io.on('connection', socket => {
 
     socket.on('start-game', (roomCode) => {
         const room = activeRooms.get(roomCode);
-        room.state = "setQ";
-        for(const playerId in room.userIds){
-          room.queue.add(playerId);
-        }
-        const first = room.queue.values().next.value;
+        room.gameState = "setQ";
+        room.queue = room.userIds;
+        const iter = room.queue.values();
+        const first = iter.next().value;
         if(first !== undefined) {
-          set.delete(first);
           room.chosen = first;
+          room.queue.delete(first);
         }
         else {
-          room.chosen = "";
+          room.chosen = "none";
         }
+        logActiveRooms(`started in room ${roomCode}`);
     });
 
     socket.on('next-player', (roomCode) => {
@@ -248,7 +250,7 @@ io.on('connection', socket => {
 
     socket.on('get-chosen', (roomCode, reply) => {
       const room = activeRooms.get(roomCode);
-      reply({chosen: room.chosen });
+      reply({ok: true, chosen: room.chosen });
     });
 
 
