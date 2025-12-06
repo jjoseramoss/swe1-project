@@ -3,35 +3,42 @@
 // websockets make connections to server
 // good for small frequent requests
 
-const io = require('socket.io')(3000, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
+const io = require("socket.io")(3000, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
 });
 
 // roomCode -> roomData
 // roomData: { scores: Map<userId, number>, userIds: Set<userId>, answers: Map<userId, string> , gameState: state}
 const activeRooms = new Map();
 const createRoomData = () => ({
+  
+  
+  userData: new Map(), // store per-user info { uid, displayName, avatarUrl} can add other info later
+  
+  question: new String(),
+  gameState: new String(),
+  //game states: start, question, answer, finished
     userIds: new Set(), // userid
     scores: new Map(), //userid, score
     answers: new Map(), // userid, answers
     names: new Map(), // userid, name
-    chosen: new String, //userid
-    question: new String, //question
-    gameState: new String, //state
+    chosen: new String(), //userid
     queue: new Set(), //userid
 
     //game states: start, question, answer, finished
 });
 
 const generateRoomCode = () => {
-    let roomCode;
-    do {
-        roomCode = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    } while (activeRooms.has(roomCode));
-    return roomCode;
+  let roomCode;
+  do {
+    roomCode = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0");
+  } while (activeRooms.has(roomCode));
+  return roomCode;
 };
 const logActiveRooms = (label) => {
     const snapshot = Array.from(activeRooms.entries()).map(([code, data]) => ({
@@ -67,67 +74,101 @@ io.on('connection', socket => {
         reply({ ok: exists });
     });
     
-    // join-lobby(roomCode, userId?, reply?)
-    socket.on("join-lobby", (roomCode, maybeUserId, userName, maybeReply) => {
-      const userId = typeof maybeUserId === 'string' ? maybeUserId : undefined;
-      const reply = typeof maybeUserId === 'function' ? maybeUserId : (typeof maybeReply === 'function' ? maybeReply : undefined);
-      const room = activeRooms.get(roomCode);
-      const exists = !!room;
-      if (room) {
-        socket.join(roomCode);
-        const idToStore = userId || socket.id;
-        room.userIds.add(idToStore);
-        room.scores.set(idToStore, 0);
-        room.answers.set(idToStore, "");
-        room.names.set(idToStore, userName);
-        room.chosen = "";
-        logActiveRooms(`joined room ${roomCode}`);
+    socket.on("join-lobby", (roomCode, maybeUser, maybeReply) => {
+    const userObj =
+      maybeUser && typeof maybeUser === "object"
+        ? maybeUser
+        : typeof maybeUser === "string"
+        ? { uid: maybeUser }
+        : undefined;
+    const reply =
+      typeof maybeUser === "function"
+        ? maybeUser
+        : typeof maybeReply === "function"
+        ? maybeReply
+        : undefined;
+    const room = activeRooms.get(roomCode);
+    const exists = !!room;
+    if (room) {
+      socket.join(roomCode);
+      const idToStore = userObj?.id || socket.id;
+      room.userIds.add(idToStore);
+      //store user data if provided
+      if (userObj && userObj.uid) {
+        room.userData.set(userObj.uid, {
+          uid: userObj.uid,
+          displayName: userObj.displayName || `User-${userObj.uid.slice(0, 6)}`,
+          avatarUrl: userObj.avatarUrl || "",
+        });
       } else {
-        console.log(`join rejected for room`, roomCode);
+        // fallback: ensure an entry exists for socket id
+        room.userData.set(idToStore, {
+          uid: idToStore,
+          displayName: idToStore,
+          avatarUrl: "",
+        });
       }
-      if (typeof reply === 'function') {
-        reply({ ok: exists });
+      room.scores.set(idToStore, 0);
+      room.answers.set(idToStore, "");
+      room.chosen = "";
+      logActiveRooms(`joined room ${roomCode}`);
+      const participants = Array.from(room.userData.values());
+      io.to(roomCode).emit("lobby:update", { participants });
+    } else {
+      console.log(`join rejected for room`, roomCode);
+    }
+    if (typeof reply === "function") {
+      reply({ ok: exists });
+    }
+  });
+
+  // leave-lobby(roomCode, userId?)
+  socket.on("leave-lobby", (roomCode, userId) => {
+    if (typeof roomCode !== "string") return;
+    socket.leave(roomCode);
+    const room = activeRooms.get(roomCode);
+    if (room) {
+      const idToRemove = userId || socket.id;
+      room.userIds.delete(idToRemove);
+      room.scores.delete(idToRemove);
+      room.answers.delete(idToRemove);
+      room.userData.delete(idToRemove);
+      if (room.userIds.size === 0) {
+        activeRooms.delete(roomCode);
+        logActiveRooms(`room ${roomCode} emptied and removed`);
+      } else {
+        logActiveRooms(`left room ${roomCode}`);
+        const participants = Array.from(room.userData.values());
+        io.to(roomCode).emit("lobby:update", { participants });
       }
-    });
+    }
+  });
 
-    // leave-lobby(roomCode, userId?)
-    socket.on("leave-lobby", (roomCode, userId) => {
-      if (typeof roomCode !== 'string') return;
-      socket.leave(roomCode);
-      const room = activeRooms.get(roomCode);
-      if (room) {
-        const idToRemove = userId || socket.id;
-        room.userIds.delete(idToRemove);
-        room.scores.delete(idToRemove);
-        room.answers.delete(idToRemove);
-        if (room.userIds.size === 0) {
-          activeRooms.delete(roomCode);
-          logActiveRooms(`room ${roomCode} emptied and removed`);
-        } else {
-          logActiveRooms(`left room ${roomCode}`);
-        }
-      }
-    });
+  socket.on("chat message", (msg) => {
+    const roomId = msg?.roomId;
+    if (!roomId) return;
+    console.log("chat message", msg, "room", roomId);
+    io.to(roomId).emit("chat message", msg); // broadcast to the room only
+  });
 
-    socket.on('chat message', (msg) => {
-        const roomId = msg?.roomId;
-        if (!roomId) return;
-        console.log('chat message', msg, 'room', roomId);    
-        io.to(roomId).emit('chat message', msg); // broadcast to the room only
-    });
-
-    
-    /** 
-    socket.on('disconnect', () => {
-      console.log('client disconnected', socket.id);
-      // remove socket from any rooms it belonged to
-      for (const [code, room] of activeRooms.entries()) {
+  socket.on("disconnect", () => {
+    console.log("client disconnected", socket.id);
+    // remove socket from any rooms it belonged to
+    for (const [code, room] of activeRooms.entries()) {
+      // find matching uid entries pointing to this socket id (best-effort)
+      // here we simply delete any entry whose uid matches socket.id
+      if (room.userIds.has(socket.id)) {
         room.userIds.delete(socket.id);
         room.scores.delete(socket.id);
         room.answers.delete(socket.id);
+        room.userData.delete(socket.id);
         if (room.userIds.size === 0) {
           activeRooms.delete(code);
           logActiveRooms(`room ${code} emptied and removed`);
+        } else {
+          const participants = Array.from(room.userData.values());
+          io.to(code).emit("lobby:update", { participants });
+          logActiveRooms(`socket disconnect cleaned up from room ${code}`);
         }
       }
     });

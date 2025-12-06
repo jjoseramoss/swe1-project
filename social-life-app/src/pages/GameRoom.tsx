@@ -21,6 +21,18 @@ import { socket } from "../lib/socket-io/socket";
 
 //host clicks button to change game state to setQ again
 
+
+//state, userid, component
+//setQ, userid = chosen, makequestionform
+//seQ, userid != chosen, waitingforquestion
+//setA, userid = chosen, waitingforquestion
+//setA, userid != chosen, answerquesitonform
+//setC, userid = chosen, selectcorrect
+//setC, userid != chosen, waitingforquestion
+//viewL, userid, leaderboard
+
+//host clicks button to change game state to setQ again
+
 const GameRoom = () => {
   const { user } = useAuth();
   const { roomId } = useParams();
