@@ -13,16 +13,14 @@ const AnswerQuestionForm = () => {
 
   useEffect(() => {
     const handleQuestion = ({question}: {question: string}) => setQuestion(question);
-    socket.on("question updated", handleQuestion)
+    socket.on("question-updated", handleQuestion);
   })
-
-
-
 
 
   const handleSubmit = () => {
     console.log(answer)
-    socket.emit('set answer', roomId, user?.uid, answer);
+    socket.emit('set-answer', roomId, user?.uid, answer);
+    socket.emit('set-game-state', roomId, "setC")
   }
 
 

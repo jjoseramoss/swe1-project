@@ -1,22 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+//import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { socket } from "../lib/socket-io/socket";
 import GameNavbar from "../components/common/GameNavbar";
 import { useAuth } from "../contexts/AuthProvider";
 
-type Message = {
-  id: string;
-  sender?: string;
-  text: string;
-  time?: number;
-  roomId?: string;
-};
+
 
 const GameLobby = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const [roomValid, setRoomValid] = useState<boolean | null>(null);
   const [participants, setParticipants] = useState<
     { uid: string; displayName?: string; avatarUrl?: string }[]
   >([]);
@@ -24,7 +17,6 @@ const GameLobby = () => {
   useEffect(() => {
     if (!roomId) return;
     let cancelled = false;
-    setRoomValid(null);
     //sends full profile object istead of only uid
     const profile = user
       ? {
@@ -33,14 +25,6 @@ const GameLobby = () => {
           avatarUrl: user.avatarUrl,
         }
       : undefined;
-    socket.emit("join-lobby", roomId, profile, (res: { ok: boolean }) => {
-      if (cancelled) return;
-      if (res?.ok) {
-        setRoomValid(true);
-      } else {
-        setRoomValid(false);
-        navigate("/joinGame", { replace: true });
-      }
     });
     return () => {
       cancelled = true;
@@ -105,7 +89,10 @@ const GameLobby = () => {
     navigate("/login");
     return null;
   }
-  if (roomValid === false) return null;
+
+  const startGame = () =>{
+    socket.emit('start-game', roomId);
+  };
 
   return (
     <>
@@ -118,7 +105,7 @@ const GameLobby = () => {
             <div className="card w-96 bg-base-100 card-xs shadow-2xl">
               <div className="card-body text-center">
                 <h2 className="font-excali font-bold text-2xl">Game Pin</h2>
-                <p className="font-bold  text-xl">1234</p>
+                <p className="font-bold  text-xl">{roomId}</p>
               </div>
             </div>
           </div>
@@ -133,7 +120,7 @@ const GameLobby = () => {
           </div>
           {/* Controls */}
           <div className="w-1/6">
-            <button className="btn btn-block bg-accent text-xl font-excali p-6">
+            <button className="btn btn-block bg-accent text-xl font-excali p-6" onClick={startGame}>
               Start Game
             </button>
           </div>
