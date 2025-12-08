@@ -69,6 +69,10 @@ const GameLobby = () => {
     if (newWindow) newWindow.opener = null;
   }
 
+  const startMethod = () => {
+    socket.emit("start-game", roomId);
+  }
+
   if (loading) return <div className="p-6">Loading...</div>;
   if (roomValid === false) return <div className="p-6">Room not found</div>;
 
@@ -102,7 +106,7 @@ const GameLobby = () => {
               Join as Player
             </button>
 
-            <button className="btn btn-block bg-accent text-xl font-excali p-6" >
+            <button className="btn btn-block bg-accent text-xl font-excali p-6" onClick={startMethod} >
               Start Game
             </button>
           </div>

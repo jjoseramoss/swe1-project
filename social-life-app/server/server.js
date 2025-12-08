@@ -132,10 +132,10 @@ io.on('connection', socket => {
     if(!room) return
 
     socket.leave(roomCode);
-    room.userIds.delete(uid)
-    room.scores.delete(uid);
-    room.answers.delete(uid);
-    room.userData.delete(uid);
+    room.userIds.delete(userId)
+    room.scores.delete(userId);
+    room.answers.delete(userId);
+    room.userData.delete(userId);
 
     logActiveRooms(`leave-lobby ${uid} from room ${roomCode}`);
 
