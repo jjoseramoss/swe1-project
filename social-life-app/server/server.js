@@ -137,7 +137,7 @@ io.on('connection', socket => {
     room.answers.delete(userId);
     room.userData.delete(userId);
 
-    logActiveRooms(`leave-lobby ${uid} from room ${roomCode}`);
+    logActiveRooms(`leave-lobby ${userId} from room ${roomCode}`);
 
     const participants = Array.from(room.userData.values());
     io.to(roomCode).emit("lobby:update", {participants, count: participants.length});
@@ -216,8 +216,25 @@ io.on('connection', socket => {
 
     socket.on('set-answer', (roomCode, userId, answer) => {
       const room = activeRooms.get(roomCode);
-      room.answers.set(userId, answer)
-      room.gameState
+      if (!room) return;
+
+      room.answers.set(userId, answer);
+      let everyoneAnswered = true;
+      for (const playerId of room.userIds) {
+        if (room.chosen && playerId === room.chosen) continue;
+        const response = room.answers.get(playerId);
+        if (!response || response.trim() === '') {
+          everyoneAnswered = false;
+          break;
+        }
+      }
+
+
+      if (everyoneAnswered) {
+        room.gameState = "setC";
+        io.to(roomCode).emit('game-state-updated', { gameState: room.gameState });
+      }
+
       logActiveRooms(`set answer in room ${roomCode}`);
     });
 
@@ -238,11 +255,13 @@ io.on('connection', socket => {
         reply({ ok: false, answers: [] });
         return;
       }
-      const answers = Array.from(room.answers.entries()).map(([userId, answer]) => ({
-        user: room.names.get(userId) || "",
-        answer,
-        id: userId,
-      }));
+      const answers = Array.from(room.answers.entries())
+        .filter(([userId]) => userId !== room.chosen)
+        .map(([userId, answer]) => ({
+          user: room.names.get(userId) || "",
+          answer,
+          id: userId,
+        }));
       reply({ ok: true, answers });
     });
 

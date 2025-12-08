@@ -20,7 +20,6 @@ const AnswerQuestionForm = () => {
   const handleSubmit = () => {
     console.log(answer)
     socket.emit('set-answer', roomId, user?.uid, answer);
-    socket.emit('set-game-state', roomId, "setC")
   }
 
 
