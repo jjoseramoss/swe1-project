@@ -187,6 +187,8 @@ io.on('connection', socket => {
         const current = room.scores.get(playerId); 
         room.scores.set(playerId, current + 1);
       }
+        room.gameState = 'viewL'
+        io.to(roomCode).emit('game-state-updated', { gameState: room.gameState });
         logActiveRooms(`added points in room ${roomCode}`);
       });
 
@@ -293,7 +295,12 @@ io.on('connection', socket => {
         const room = activeRooms.get(roomCode);
         if (!room) return;
         room.gameState = "setQ";
-        room.queue = room.userIds;
+        // create an independent queue so mutations don't change userIds
+        room.queue = new Set(room.userIds);
+        // reset all answers at the start of the round
+        for (const uid of room.answers.keys()) {
+          room.answers.set(uid, '');
+        }
         const iter = room.queue.values();
         const first = iter.next().value;
         if(first !== undefined) {
@@ -306,6 +313,28 @@ io.on('connection', socket => {
         io.to(roomCode).emit('game-state-updated', { gameState: room.gameState });
         logActiveRooms(`started in room ${roomCode}`);
     });
+
+    socket.on('start-next-game', (roomCode) => {
+        const room = activeRooms.get(roomCode);
+        if (!room) return;
+        room.gameState = "setQ";
+        // reset all answers at the start of the round
+        for (const uid of room.answers.keys()) {
+          room.answers.set(uid, '');
+        }
+        const iter = room.queue.values();
+        const first = iter.next().value;
+        if(first !== undefined) {
+          room.chosen = first;
+          room.queue.delete(first);
+        }
+        else {
+          room.chosen = "none";
+        }
+        io.to(roomCode).emit('game-state-updated', { gameState: room.gameState });
+        logActiveRooms(`started in room ${roomCode}`);
+    });
+
 
     socket.on('next-player', (roomCode) => {
       const room = activeRooms.get(roomCode);

@@ -58,6 +58,7 @@ const SelectCorrect = () => {
   };
 
   const handleSubmit = () => {
+    socket.emit("add-points", roomId, correctUsers);
   }
 
   
@@ -80,7 +81,7 @@ const SelectCorrect = () => {
                 transition: "transform 200ms ease",
               }}
                 className={`bg-white rounded-2xl flex gap-4 p-4 m-5 shadow-sm`}>
-                    <input onChange={handleChange} value={opt.user} type="checkbox" className="checkbox checkbox-success" />
+                    <input onChange={handleChange} value={opt.id} type="checkbox" className="checkbox checkbox-success" />
                     <p className="text-xl font-excali">{opt.answer}</p>
                 </li>
             ))}
