@@ -14,21 +14,17 @@ const io = require("socket.io")(3000, {
 // roomData: { scores: Map<userId, number>, userIds: Set<userId>, answers: Map<userId, string> , gameState: state}
 const activeRooms = new Map();
 const createRoomData = () => ({
-  
-  
+  host: new String(),
   userData: new Map(), // store per-user info { uid, displayName, avatarUrl} can add other info later
-  
   question: new String(),
   gameState: new String(),
+  userIds: new Set(), // userid
+  scores: new Map(), //userid, score
+  answers: new Map(), // userid, answers
+  names: new Map(), // userid, name
+  chosen: new String(), //userid
+  queue: new Set(), //userid
   //game states: start, question, answer, finished
-    userIds: new Set(), // userid
-    scores: new Map(), //userid, score
-    answers: new Map(), // userid, answers
-    names: new Map(), // userid, name
-    chosen: new String(), //userid
-    queue: new Set(), //userid
-
-    //game states: start, question, answer, finished
 });
 
 const generateRoomCode = () => {
@@ -100,6 +96,8 @@ io.on('connection', socket => {
           uid: userObj.uid,
           displayName: userObj.displayName || `User-${userObj.uid.slice(0, 6)}`,
           avatarUrl: userObj.avatarUrl || "",
+          bio: userObj.bio || "",
+          insta: userObj.insta || ""
         });
       } else {
         // fallback: ensure an entry exists for socket id
@@ -107,6 +105,8 @@ io.on('connection', socket => {
           uid: idToStore,
           displayName: idToStore,
           avatarUrl: "",
+          bio: "",
+          insta: ""
         });
       }
       room.scores.set(idToStore, 0);
@@ -115,7 +115,9 @@ io.on('connection', socket => {
       room.chosen = "";
       logActiveRooms(`joined room ${roomCode}`);
       const participants = Array.from(room.userData.values());
-      io.to(roomCode).emit("lobby:update", { participants });
+      io.to(roomCode).emit("lobby:update", { participants, count: participants.length });
+
+
     } else {
       console.log(`join rejected for room`, roomCode);
     }
@@ -126,23 +128,23 @@ io.on('connection', socket => {
 
   // leave-lobby(roomCode, userId?)
   socket.on("leave-lobby", (roomCode, userId) => {
-    if (typeof roomCode !== "string") return;
-    socket.leave(roomCode);
     const room = activeRooms.get(roomCode);
-    if (room) {
-      const idToRemove = userId || socket.id;
-      room.userIds.delete(idToRemove);
-      room.scores.delete(idToRemove);
-      room.answers.delete(idToRemove);
-      room.userData.delete(idToRemove);
-      if (room.userIds.size === 0) {
-        activeRooms.delete(roomCode);
-        logActiveRooms(`room ${roomCode} emptied and removed`);
-      } else {
-        logActiveRooms(`left room ${roomCode}`);
-        const participants = Array.from(room.userData.values());
-        io.to(roomCode).emit("lobby:update", { participants });
-      }
+    if(!room) return
+
+    socket.leave(roomCode);
+    room.userIds.delete(uid)
+    room.scores.delete(uid);
+    room.answers.delete(uid);
+    room.userData.delete(uid);
+
+    logActiveRooms(`leave-lobby ${uid} from room ${roomCode}`);
+
+    const participants = Array.from(room.userData.values());
+    io.to(roomCode).emit("lobby:update", {participants, count: participants.length});
+
+    if(room.userIds.size === 0){
+      activeRooms.delete(roomCode);
+      logActiveRooms(`room ${roomCode} emptied and removed`)
     }
   });
 

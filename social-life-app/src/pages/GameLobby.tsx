@@ -1,110 +1,76 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { socket } from "../lib/socket-io/socket";
 import GameNavbar from "../components/common/GameNavbar";
 import { useAuth } from "../contexts/AuthProvider";
 
-type Message = {
-  id: string;
-  sender?: string;
-  text: string;
-  time?: number;
-  roomId?: string;
-};
+
 
 type Participant = {
   uid: string;
   displayName?: string;
   avatarUrl?: string;
+  bio?: string;
+  insta?: string;
 }
 
 const GameLobby = () => {
-  const { user, loading } = useAuth();
+ const { user, loading } = useAuth();
+  const { roomId } = useParams();
   const navigate = useNavigate();
-  const { roomId } = useParams<{roomId: string}>();
+
   const [participants, setParticipants] = useState<Participant[]>([]);
+  const [roomValid, setRoomValid] = useState<boolean | null>(null);
 
-  // chat state
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-  //Listen for lobby updates from server
+  // Join room on mount
   useEffect(() => {
-    if (loading) return;
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-    if(!roomId) return;
+    if (!roomId || !user) return;
 
-    //Handler for server lobby updates
-    const lobbyHandler = (payload: { participants: Participant[] }) => {
-      setParticipants(payload.participants || []);
+    const userProfile = {
+      uid: user.uid,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      insta: user.insta,
     };
 
-    // attach listener once
-    socket.on("lobby:update", lobbyHandler);
+    console.log(`[GameLobby] Joining room ${roomId} as ${user.displayName}`);
 
-     // Request current participants in case we missed the join event
-  const requestParticipants = () => {
-    socket.emit("get-users", roomId, (res: { participants?: Participant[] } | null) => {
-      setParticipants(res?.participants || []);
+    socket.emit("join-lobby", roomId, userProfile, (res: any) => {
+      if (res?.ok) {
+        setRoomValid(true);
+      } else {
+        setRoomValid(false);
+        navigate("/joingame", { replace: true });
+      }
     });
-  };
-
-  if(socket.connected) {
-    requestParticipants();
-  }else{
-    const onConnect = () => requestParticipants();
-    socket.once("connect", onConnect)
-  }
 
     return () => {
-      socket.off("lobby:update", lobbyHandler);
+      socket.emit("leave-lobby", roomId, user.uid);
     };
-  }, [roomId, user, loading, navigate]);
+  }, [roomId, user, navigate]);
 
-
+  // CRITICAL: Listen for lobby updates from server
   useEffect(() => {
-    //receive messages
-    const handler = (msg: Message) => {
-      setMessages((prev) =>
-        prev.some((existing) => existing.id === msg.id) ? prev : [...prev, msg]
-      );
+    const handleLobbyUpdate = (data: { participants: Participant[]; count: number }) => {
+      console.log(`[GameLobby] Received lobby update:`, data.participants);
+      setParticipants(data.participants || []);
     };
-    socket.on("chat message", handler);
+
+    socket.on("lobby:update", handleLobbyUpdate);
 
     return () => {
-      socket.off("chat message", handler);
+      socket.off("lobby:update", handleLobbyUpdate);
     };
   }, []);
 
-  useEffect(() => {
-    //scroll to bottom when messages change
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  const handleNavigate = () => {
+    const newWindow = window.open(`http://localhost:5173/gameplay/${roomId}`, '_blank', 'noopener,noreferrer');
+    if (newWindow) newWindow.opener = null;
+  }
 
-  const sendMessage = () => {
-    if (!roomId) return;
-    if (!input.trim()) return;
-    const msg: Message = {
-      id: Date.now().toString(),
-      sender: user?.displayName, 
-      text: input.trim(),
-      time: Date.now(),
-      roomId,
-    };
-    socket.emit("chat message", msg);
-    setInput("");
-    setMessages((prev) => [...prev, msg]);
-  };
-  if (loading) return <div>Loading...</div>;
-  if (!user) return null; // handled in effect
-
-  const startGame = () =>{
-    socket.emit('start-game', roomId);
-  };
+  if (loading) return <div className="p-6">Loading...</div>;
+  if (roomValid === false) return <div className="p-6">Room not found</div>;
 
   return (
     <>
@@ -127,65 +93,26 @@ const GameLobby = () => {
         <div className="w-full flex justify-between px-5 mt-4">
           {/* Info */}
           <div className="font-extralight text-gray-500 text-sm">
-            <p>Game Mode: Icebreaker Edition</p>
+            <p>Game Mode: Custom Edition</p>
             <p>Host: Jomama</p>
           </div>
           {/* Controls */}
-          <div className="w-1/6">
-            <button className="btn btn-block bg-accent text-xl font-excali p-6" onClick={startGame}>
+          <div className="w-1/8">
+            <button onClick={handleNavigate} className="btn btn-block bg-primary text-primary-content text-xl font-excali p-6" >
+              Join as Player
+            </button>
+
+            <button className="btn btn-block bg-accent text-xl font-excali p-6" >
               Start Game
             </button>
           </div>
         </div>
 
-        {/* Chat and Players Components */}
+        {/*Players Components */}
         <div className="min-h-0 pb-30 flex-1 overflow-hidden  flex justify-around mx-5 mt-5">
-          {/* Chat */}
-          <div
-            className={`
-           lg:w-1/4 flex-col
-          card card-lg shadow-xl border h-full bg-slate-100`}
-          >
-            <div className="border-b-2 p-4 shrink-0">
-              <h1 className="text-4xl font-excali text-center">Chat</h1>
-            </div>
-
-            {/* Messages (dynamic) */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((m) => (
-                <div
-                  key={m.id}
-                  className={`chat ${
-                    m.sender === user.displayName ? "chat-end" : "chat-start"
-                  }`}
-                >
-                  <div className="chat-header">{m.sender}</div>
-                  <div className="chat-bubble">{m.text}</div>
-                </div>
-              ))}
-              <div ref={messagesEndRef}></div>
-              <div />
-            </div>
-            {/* Controls */}
-            <div className="flex p-4 border-t  shrink-0">
-              <input
-                onChange={(e) => setInput(e.target.value)}
-                value={input}
-                className="input border-base-300 w-full mr-2 text-end"
-                placeholder="Type Here"
-                type="text"
-              />
-              <button
-                onClick={sendMessage}
-                className=" btn btn-info text-white"
-              >
-                Send
-              </button>
-            </div>
-          </div>
-
+         
           {/* Players */}
-          <div className="w-3/5 border rounded-xl h-full flex flex-col ">
+          <div className="w-4/5 border rounded-xl h-full flex flex-col ">
             <h2 className="text-4xl font-excali text-center p-5 border-b">
               Players
             </h2>
@@ -222,11 +149,11 @@ const GameLobby = () => {
                     <h3 className="font-bold text-lg text-center">{p.displayName}</h3>
                     <p className="py-4">
                       <span className="font-bold">Bio: </span>
-                      Press ESC key or click outside to close
+                      {p.bio}
                     </p>
                     <h3 className="font-bold">Socials:</h3>
                     <ul className="">
-                      <li>Instagram: @jomama</li>
+                      <li>Instagram: <a href={p.insta || ""}>{p.insta || ""}</a></li>
                     </ul>
                   </div>
                   <form method="dialog" className="modal-backdrop">

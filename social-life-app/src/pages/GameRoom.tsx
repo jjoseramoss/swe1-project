@@ -61,15 +61,15 @@ const GameRoom = () => {
     switch (gameState) {
       case "setQ":
       case "seQ":
-        return isChosen ? <MakeQuestionForm /> : <WaitingForQuestion />;
+        return isChosen ? <MakeQuestionForm /> : <WaitingForQuestion roomId={roomId}/>;
       case "setA":
-        return isChosen ? <WaitingForQuestion /> : <AnswerQuestionForm />;
+        return isChosen ? <WaitingForQuestion roomId={roomId} /> : <AnswerQuestionForm />;
       case "setC":
-        return isChosen ? <SelectCorrect /> : <WaitingForQuestion />;
+        return isChosen ? <SelectCorrect /> : <WaitingForQuestion roomId={roomId}/>;
       case "viewL":
         return <Leaderboard />;
       default:
-        return <WaitingForQuestion />;
+        return <WaitingForQuestion roomId={roomId}/>;
     }
   };
 

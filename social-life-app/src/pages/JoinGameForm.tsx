@@ -25,6 +25,8 @@ const JoinGameForm = () => {
           uid: user.uid,
           displayName: user.displayName,
           avatarUrl: user.avatarUrl,
+          bio: user.bio,
+          insta: user.insta
         }
       : undefined;
 
@@ -39,7 +41,7 @@ const JoinGameForm = () => {
       setIsChecking(false);
       if (res?.ok) {
         socket.emit('join-lobby', gameID, profile, reply);
-        navigate(`/game/${gameID}`);
+        navigate(`/gameplay/${gameID}`);
       } else {
         setError("Room not found or inactive.");
       }
