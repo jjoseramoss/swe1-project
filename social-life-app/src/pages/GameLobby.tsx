@@ -12,34 +12,59 @@ type Message = {
   roomId?: string;
 };
 
+type Participant = {
+  uid: string;
+  displayName?: string;
+  avatarUrl?: string;
+}
+
 const GameLobby = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const { roomId } = useParams();
-  const [participants, setParticipants] = useState<
-    { uid: string; displayName?: string; avatarUrl?: string }[]
-  >([]);
-
-
-
-  //Listen for lobby updates from server
-  useEffect(() => {
-    const handler = (payload: { participants: any[] }) => {
-      setParticipants(payload.participants || []);
-    };
-    socket.on("lobby:update", handler);
-    return () => {
-      socket.off("lobby:update", handler);
-    };
-  });
-  // state to manage which tab is active on mobile
-  // 'participants' or 'chat'
-  //const [activeTab, setActiveTab] = useState("participants");
+  const { roomId } = useParams<{roomId: string}>();
+  const [participants, setParticipants] = useState<Participant[]>([]);
 
   // chat state
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  //Listen for lobby updates from server
+  useEffect(() => {
+    if (loading) return;
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    if(!roomId) return;
+
+    //Handler for server lobby updates
+    const lobbyHandler = (payload: { participants: Participant[] }) => {
+      setParticipants(payload.participants || []);
+    };
+
+    // attach listener once
+    socket.on("lobby:update", lobbyHandler);
+
+     // Request current participants in case we missed the join event
+  const requestParticipants = () => {
+    socket.emit("get-users", roomId, (res: { participants?: Participant[] } | null) => {
+      setParticipants(res?.participants || []);
+    });
+  };
+
+  if(socket.connected) {
+    requestParticipants();
+  }else{
+    const onConnect = () => requestParticipants();
+    socket.once("connect", onConnect)
+  }
+
+    return () => {
+      socket.off("lobby:update", lobbyHandler);
+    };
+  }, [roomId, user, loading, navigate]);
+
 
   useEffect(() => {
     //receive messages
@@ -65,7 +90,7 @@ const GameLobby = () => {
     if (!input.trim()) return;
     const msg: Message = {
       id: Date.now().toString(),
-      sender: user?.displayName, // replace with real username later
+      sender: user?.displayName, 
       text: input.trim(),
       time: Date.now(),
       roomId,
@@ -75,10 +100,7 @@ const GameLobby = () => {
     setMessages((prev) => [...prev, msg]);
   };
   if (loading) return <div>Loading...</div>;
-  if (!user) {
-    navigate("/login");
-    return null;
-  };
+  if (!user) return null; // handled in effect
 
   const startGame = () =>{
     socket.emit('start-game', roomId);
@@ -141,7 +163,7 @@ const GameLobby = () => {
                   <div className="chat-bubble">{m.text}</div>
                 </div>
               ))}
-
+              <div ref={messagesEndRef}></div>
               <div />
             </div>
             {/* Controls */}
@@ -169,13 +191,20 @@ const GameLobby = () => {
             </h2>
 
             {/* List of Players */}
-            {participants.map((p, idx) => (
-              <div className="collapse collapse-arrow shadow-xl h-[6em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
+              {
+                participants.length === 0 && (
+                  <p className="text-center text-gray-500">No participants yet</p>
+                )
+              }
+
+            {participants && participants.map((p, idx) => (
+              <div key={p.uid || idx} className="collapse collapse-arrow shadow-xl h-[6em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
                 <div className="circle absolute h-[5em] w-[5em] -bottom-[2.5em] -right-[2.5em] rounded-full bg-accent group-hover:scale-[800%] duration-500 z-[-1] op"></div>
                 <div
-                  onClick={() =>
-                    document.getElementById(`modal_${idx}`).showModal()
-                  }
+                  onClick={() => {
+                    const dlg = document.getElementById(`modal_${p.uid || idx}`) as HTMLDialogElement | null;
+                    dlg?.showModal();
+                  }}
                   className="avatar flex justify-between"
                 >
                   <div className="w-12 rounded-full">
@@ -188,7 +217,7 @@ const GameLobby = () => {
                 </div>
 
                 {/* Modal */}
-                <dialog id={`modal_${idx}`} className="modal">
+                <dialog id={`modal_${p.uid || idx}`} className="modal">
                   <div className="modal-box">
                     <h3 className="font-bold text-lg text-center">{p.displayName}</h3>
                     <p className="py-4">

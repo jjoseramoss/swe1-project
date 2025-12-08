@@ -39,7 +39,7 @@ const JoinGameForm = () => {
       setIsChecking(false);
       if (res?.ok) {
         socket.emit('join-lobby', gameID, profile, reply);
-        navigate(`/gameplay/${gameID}`);
+        navigate(`/game/${gameID}`);
       } else {
         setError("Room not found or inactive.");
       }

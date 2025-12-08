@@ -261,10 +261,11 @@ io.on('connection', socket => {
       if (typeof reply !== 'function') return;
       const room = activeRooms.get(roomCode);
       if (!room) {
-        reply({ ok: false, users: [] });
+        reply({ ok: false, participants: [] });
         return;
       }
-      reply({ ok: true, users: Array.from(room.userIds) });
+      const participants = Array.from(room.userData.values());
+      reply({ ok: true, participants});
     });
 
     socket.on('start-game', (roomCode) => {
