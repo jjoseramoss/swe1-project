@@ -1,5 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { socket } from "../../lib/socket-io/socket";
+import { useParams } from "react-router-dom";
 
+/** 
 const users = [
   { id: 1, name: "Jo", score: 1500},
   { id: 2, name: "Jomama", score: 1250 },
@@ -7,13 +10,60 @@ const users = [
   { id: 4, name: "Victor", score: 1 },
   { id: 5, name: "Hector", score: 1249 },
 ];
+*/
+type ScoreRow = { uid: string; user: string; score: number; place: number };
 
 const randomAngle = (min = -5, max = 5) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
 const Leaderboard = () => {
-  const angles = useMemo(() => users.map(() => randomAngle()), []);
+  const { roomId } = useParams();
+  const [scores, setScores] = useState<ScoreRow[]>([]);
+  const angles = useMemo(() => scores.map(() => randomAngle()), [scores.length]);
 
+  useEffect(() => {
+    if (!roomId) return;
+
+    socket.emit(
+      "get-scores-map",
+      roomId,
+      (res: {
+        ok: boolean;
+        answers?: { id?: string; user?: string; score?: number | string }[];
+      }) => {
+        if (!res?.ok || !Array.isArray(res.answers)) return;
+
+        const sorted = res.answers
+          .map((a) => ({
+            uid: a.id ?? "",
+            user: a.user ?? "",
+            score: Number(a.score) || 0,
+          }))
+          .sort((a, b) => b.score - a.score);
+
+        const ranked: ScoreRow[] = [];
+        sorted.forEach((entry, idx) => {
+          const prev = ranked[idx - 1];
+          const place = prev && prev.score === entry.score ? prev.place : idx + 1;
+          ranked.push({ ...entry, place });
+        });
+
+        setScores((prev) => {
+          const sameLength = prev.length === ranked.length;
+          const same =
+            sameLength &&
+            prev.every(
+              (p, i) =>
+                p.uid === ranked[i].uid &&
+                p.user === ranked[i].user &&
+                p.score === ranked[i].score &&
+                p.place === ranked[i].place
+            );
+          return same ? prev : ranked;
+        });
+      }
+    );
+  }, [roomId]);
 
 
   return (
@@ -34,16 +84,15 @@ const Leaderboard = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user, idx) => (
+              {scores.map((opt, idx) => (
                 <tr
-                key={user.id}
-                style={{
-                transform: `rotate(${angles[idx]}deg)`,
-                transition: "transform 200ms ease",
-              }}>
-                <td>
-                    {user.id}
-                </td>
+                  key={opt.uid || idx}
+                  style={{
+                    transform: `rotate(${angles[idx]}deg)`,
+                    transition: "transform 200ms ease",
+                  }}
+                >
+                  <td>{opt.place}</td>
                   <td className="text-xl">
                     <div className="flex items-center gap-3 ">
                       <div className="avatar">
@@ -55,14 +104,12 @@ const Leaderboard = () => {
                         </div>
                       </div>
                       <div>
-                        <div className="font-bold">{user.name}</div>
+                        <div className="font-bold">{opt.user}</div>
                       </div>
                     </div>
                   </td>
 
-                  <td>
-                    {user.score}
-                  </td>
+                  <td>{opt.score}</td>
                 </tr>
               ))}
             </tbody>

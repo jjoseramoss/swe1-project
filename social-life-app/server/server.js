@@ -267,6 +267,22 @@ io.on('connection', socket => {
       reply({ ok: true, answers });
     });
 
+    socket.on('get-scores-map', (roomCode, reply) => {
+      if (typeof reply !== 'function') return;
+      const room = activeRooms.get(roomCode);
+      if (!room) {
+        reply({ ok: false, answers: [] });
+        return;
+      }
+      const answers = Array.from(room.scores.entries())
+        .map(([userId, score]) => ({
+          id: userId,
+          user: room.names.get(userId) || "",
+          score: score,
+        }));
+      reply({ ok: true, answers });
+    });
+
     socket.on('set-game-state', (roomCode, state) => {
       const room = activeRooms.get(roomCode);
       if (!room) return;
