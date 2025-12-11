@@ -26,6 +26,8 @@ const GameRoom = () => {
   const { roomId } = useParams();
 
   const [chosen, setChosen] = useState<string>();
+  const [chosenName, setChosenName] = useState<string>();
+  const [question, setQuestion] = useState<string>();
   const [gameState, setGameState] = useState<string>();
 
   useEffect(() => {
@@ -33,7 +35,18 @@ const GameRoom = () => {
 
     const refreshState = () => {
       socket.emit('get-chosen', roomId, (reply: { ok?: boolean; chosen?: string }) => {
-        if (reply?.ok && typeof reply.chosen === "string") setChosen(reply.chosen);
+        if (reply?.ok && typeof reply.chosen === "string") {
+          setChosen(reply.chosen);
+          if (reply.chosen){
+            socket.emit('get-name', roomId, reply.chosen, (nameReply: {name?: string}) => {
+              setChosenName(nameReply?.name || "");
+            })
+          }
+        }
+      });
+      
+      socket.emit('get-question', roomId, (reply: { question?: string}) => {
+        setQuestion(reply?.question || "");
       });
 
       socket.emit('get-game-state', roomId, (reply: { gameState?: string }) => {
@@ -58,18 +71,22 @@ const GameRoom = () => {
   const renderGameContent = () => {
     const isChosen = !!user && user.uid === chosen;
 
+    if(!gameState) {
+      return <WaitingForQuestion roomId={roomId} msg="Waiting for game to start"/>
+    }
+
     switch (gameState) {
       case "setQ":
       case "seQ":
-        return isChosen ? <MakeQuestionForm /> : <WaitingForQuestion roomId={roomId}/>;
+        return isChosen ? <MakeQuestionForm /> : <WaitingForQuestion roomId={roomId} msg={ `Waiting for ${chosenName} to create a question...`}/>;
       case "setA":
-        return isChosen ? <WaitingForQuestion roomId={roomId} /> : <AnswerQuestionForm />;
+        return isChosen ? <WaitingForQuestion roomId={roomId} msg={`Waiting for others to answer...`} /> : <AnswerQuestionForm chosenName={chosenName} question={question}/>;
       case "setC":
-        return isChosen ? <SelectCorrect /> : <WaitingForQuestion roomId={roomId}/>;
+        return isChosen ? <SelectCorrect /> : <WaitingForQuestion roomId={roomId} msg={`Waiting for ${chosenName} to select the correct answer...`}/>;
       case "viewL":
         return <Leaderboard />;
       default:
-        return <WaitingForQuestion roomId={roomId}/>;
+        return <WaitingForQuestion roomId={roomId} msg="Waiting for game to start..."/>;
     }
   };
 

@@ -1,20 +1,18 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { socket } from "../../lib/socket-io/socket";
 import { useAuth } from "../../contexts/AuthProvider";
 import { useParams } from "react-router-dom";
 
+interface data {
+  chosenName?: string;
+  question?: string;
+}
 
-const AnswerQuestionForm = () => {
+
+const AnswerQuestionForm: React.FC<data> = ({ chosenName = "Chosen Player's", question }) => {
   const { user } = useAuth();
   const { roomId } = useParams();
   const [answer, setAnswer] = useState("");
-  const [question, setQuestion] = useState<string>("Temp");
-  const questionUser = "Jomama"
-
-  useEffect(() => {
-    const handleQuestion = ({question}: {question: string}) => setQuestion(question);
-    socket.on("question-updated", handleQuestion);
-  })
 
 
   const handleSubmit = () => {
@@ -27,7 +25,7 @@ const AnswerQuestionForm = () => {
     <div className="w-full min-h-screen flex justify-center items-start bg-base-content py-8">
       <div className="flex flex-col items-center w-full">
         <h1 className="text-4xl pt-6 font-excali text-primary-content md:text-6xl text-center mb-10">
-          {questionUser} Question:
+          {chosenName} Question:
         </h1>
         <p className="text-primary-content text-center font-excali text-5xl">{question}</p>
 

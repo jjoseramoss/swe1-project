@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { socket } from "../lib/socket-io/socket";
 import GameNavbar from "../components/common/GameNavbar";
 import { useAuth } from "../contexts/AuthProvider";
-
-
+import { Link } from "react-router-dom";
 
 type Participant = {
   uid: string;
@@ -12,10 +11,10 @@ type Participant = {
   avatarUrl?: string;
   bio?: string;
   insta?: string;
-}
+};
 
 const GameLobby = () => {
- const { user, loading } = useAuth();
+  const { user, loading } = useAuth();
   const { roomId } = useParams();
   const navigate = useNavigate();
 
@@ -52,7 +51,10 @@ const GameLobby = () => {
 
   // CRITICAL: Listen for lobby updates from server
   useEffect(() => {
-    const handleLobbyUpdate = (data: { participants: Participant[]; count: number }) => {
+    const handleLobbyUpdate = (data: {
+      participants: Participant[];
+      count: number;
+    }) => {
       console.log(`[GameLobby] Received lobby update:`, data.participants);
       setParticipants(data.participants || []);
     };
@@ -64,18 +66,13 @@ const GameLobby = () => {
     };
   }, []);
 
-  const handleNavigate = () => {
-    const newWindow = window.open(`http://localhost:5173/gameplay/${roomId}`, '_blank', 'noopener,noreferrer');
-    if (newWindow) newWindow.opener = null;
-  }
-
   const startMethod = () => {
     socket.emit("start-game", roomId);
-  }
+  };
 
   const nextMethod = () => {
     socket.emit("start-next-game", roomId);
-  }
+  };
 
   if (loading) return <div className="p-6">Loading...</div>;
   if (roomValid === false) return <div className="p-6">Room not found</div>;
@@ -99,29 +96,29 @@ const GameLobby = () => {
 
         {/*Host Game Settings/Info */}
         <div className="w-full flex justify-between px-5 mt-4">
-          {/* Info */}
-          <div className="font-extralight text-gray-500 text-sm">
-            <p>Game Mode: Custom Edition</p>
-            <p>Host: Jomama</p>
-          </div>
           {/* Controls */}
-          <div className="w-1/8">
-            <button onClick={handleNavigate} className="btn btn-block bg-primary text-primary-content text-xl font-excali p-6" >
-              Join as Player
+          <button className="btn btn-lg  bg-primary text-primary-content text-xl font-excali p-6">
+              <Link to="/joinGame" target="_blank" rel="noopener noreferrer">
+                Join as Player
+              </Link>
             </button>
 
-            <button className="btn btn-block bg-accent text-xl font-excali p-6" onClick={startMethod} >
+            <button
+              className="btn btn-lg bg-accent text-xl font-excali p-6"
+              onClick={startMethod}
+            >
               Start Game
             </button>
-            <button className="btn btn-block bg-accent text-xl font-excali p-6" onClick={nextMethod} >
+            <button
+              className="btn btn-lg bg-accent text-xl font-excali p-6"
+              onClick={nextMethod}
+            >
               Next Round
             </button>
-          </div>
         </div>
 
         {/*Players Components */}
         <div className="min-h-0 pb-30 flex-1 overflow-hidden  flex justify-around mx-5 mt-5">
-         
           {/* Players */}
           <div className="w-4/5 border rounded-xl h-full flex flex-col ">
             <h2 className="text-4xl font-excali text-center p-5 border-b">
@@ -129,50 +126,58 @@ const GameLobby = () => {
             </h2>
 
             {/* List of Players */}
-              {
-                participants.length === 0 && (
-                  <p className="text-center text-gray-500">No participants yet</p>
-                )
-              }
+            {participants.length === 0 && (
+              <p className="text-center text-gray-500">No participants yet</p>
+            )}
 
-            {participants && participants.map((p, idx) => (
-              <div key={p.uid || idx} className="collapse collapse-arrow shadow-xl h-[6em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0">
-                <div className="circle absolute h-[5em] w-[5em] -bottom-[2.5em] -right-[2.5em] rounded-full bg-accent group-hover:scale-[800%] duration-500 z-[-1] op"></div>
+            {participants &&
+              participants.map((p, idx) => (
                 <div
-                  onClick={() => {
-                    const dlg = document.getElementById(`modal_${p.uid || idx}`) as HTMLDialogElement | null;
-                    dlg?.showModal();
-                  }}
-                  className="avatar flex justify-between"
+                  key={p.uid || idx}
+                  className="collapse collapse-arrow shadow-xl h-[6em] w-[15em] bg-white m-auto rounded-[1em] overflow-hidden relative group p-2 z-0"
                 >
-                  <div className="w-12 rounded-full">
-                    <img src={`/avatars/${p.avatarUrl}`} />
+                  <div className="circle absolute h-[5em] w-[5em] -bottom-[2.5em] -right-[2.5em] rounded-full bg-accent group-hover:scale-[800%] duration-500 z-[-1] op"></div>
+                  <div
+                    onClick={() => {
+                      const dlg = document.getElementById(
+                        `modal_${p.uid || idx}`
+                      ) as HTMLDialogElement | null;
+                      dlg?.showModal();
+                    }}
+                    className="avatar flex justify-between"
+                  >
+                    <div className="w-12 rounded-full">
+                      <img src={`/avatars/${p.avatarUrl}`} />
+                    </div>
+                    {/* Username */}
+                    <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
+                      {p.displayName}
+                    </h1>
                   </div>
-                  {/* Username */}
-                  <h1 className="z-20 font-bold font-Poppin group-hover:text-white duration-500 text-[1.4em]">
-                    {p.displayName}
-                  </h1>
-                </div>
 
-                {/* Modal */}
-                <dialog id={`modal_${p.uid || idx}`} className="modal">
-                  <div className="modal-box">
-                    <h3 className="font-bold text-lg text-center">{p.displayName}</h3>
-                    <p className="py-4">
-                      <span className="font-bold">Bio: </span>
-                      {p.bio}
-                    </p>
-                    <h3 className="font-bold">Socials:</h3>
-                    <ul className="">
-                      <li>Instagram: <a href={p.insta || ""}>{p.insta || ""}</a></li>
-                    </ul>
-                  </div>
-                  <form method="dialog" className="modal-backdrop">
-                    <button>close</button>
-                  </form>
-                </dialog>
-              </div>
-            ))}
+                  {/* Modal */}
+                  <dialog id={`modal_${p.uid || idx}`} className="modal">
+                    <div className="modal-box">
+                      <h3 className="font-bold text-lg text-center">
+                        {p.displayName}
+                      </h3>
+                      <p className="py-4">
+                        <span className="font-bold">Bio: </span>
+                        {p.bio}
+                      </p>
+                      <h3 className="font-bold">Socials:</h3>
+                      <ul className="">
+                        <li>
+                          Instagram: <a href={p.insta || ""}>{p.insta || ""}</a>
+                        </li>
+                      </ul>
+                    </div>
+                    <form method="dialog" className="modal-backdrop">
+                      <button>close</button>
+                    </form>
+                  </dialog>
+                </div>
+              ))}
           </div>
         </div>
       </div>

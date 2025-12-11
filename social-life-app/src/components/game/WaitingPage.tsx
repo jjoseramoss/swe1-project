@@ -4,7 +4,6 @@ import { useAuth } from "../../contexts/AuthProvider";
 
 interface Room {
   roomId: string | undefined;
-  msg?: string;
 }
 
 type Message = {
@@ -15,7 +14,7 @@ type Message = {
   roomId?: string;
 };
 
-const WaitingForQuestion: React.FC<Room> = ({ roomId, msg = "Please wait..." }) => {
+const WaitingPage: React.FC<Room> = ({ roomId }) => {
   const { user, loading } = useAuth();
 
   // chat state
@@ -72,7 +71,7 @@ const WaitingForQuestion: React.FC<Room> = ({ roomId, msg = "Please wait..." }) 
             <span className="loading loading-dots loading-xl"></span>
 
             <p className="text-2xl">
-              {msg}
+              Waiting for Game to Begin...
             </p>
           </div>
         </div>
@@ -128,4 +127,4 @@ const WaitingForQuestion: React.FC<Room> = ({ roomId, msg = "Please wait..." }) 
   );
 };
 
-export default WaitingForQuestion;
+export default WaitingPage;

@@ -7,7 +7,7 @@ const teamMembers = [
   {
     name: 'Victor Muñoz',
     linkedin: 'https://www.linkedin.com/in/victormunozdev/',
-    image: 'https://media.licdn.com/dms/image/v2/D5635AQEMJ-IZEQ9Z8w/profile-framedphoto-shrink_400_400/profile-framedphoto-shrink_400_400/0/1728052668754?e=1765400400&v=beta&t=WkmiZwQj2wiFiQAGG6NycjxkO4rkJBclwYL8YpiAOew'
+    image: 'https://media.licdn.com/dms/image/v2/D5635AQEMJ-IZEQ9Z8w/profile-framedphoto-shrink_200_200/profile-framedphoto-shrink_200_200/0/1728052668754?e=1766066400&v=beta&t=ACSR0DGVVJIEG0XPBUwKnajPkGfXe2CY0amErBWZZn4'
   },
   {
     name: 'Jose Ramos',
@@ -89,7 +89,7 @@ const About = () => {
               <span role="img" aria-label="puzzle">🧩</span> Tech Stack
             </h2>
             <div className="flex flex-wrap gap-3">
-              {['React', 'TypeScript', 'Vite', 'Firebase', 'Tailwind CSS'].map((tech) => (
+              {['React', 'TypeScript', 'Vite', 'Firebase', 'Tailwind CSS', 'Socket.IO'].map((tech) => (
                 <span 
                   key={tech} 
                   className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full text-base md:text-lg font-medium"
