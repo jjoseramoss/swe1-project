@@ -60,7 +60,7 @@ const Profile = () => {
   };
 
   const filterUpdateData = (data: { [x: string]: any }) => {
-    const filteredData = {};
+    const filteredData: { [x: string]: any } = {};
     Object.keys(data).forEach((key) => {
       // Only copy the field if its value is not undefined and not null
       if (data[key] !== undefined && data[key] !== null) {
