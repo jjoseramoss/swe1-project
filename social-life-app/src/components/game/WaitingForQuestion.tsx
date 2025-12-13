@@ -60,6 +60,70 @@ const WaitingForQuestion: React.FC<Room> = ({ roomId, msg = "Please wait..." }) 
   if (loading) return <div>Loading...</div>;
   if (!user) return <div>Login Please</div>;
 
+  if(msg == "Waiting for game to start..."){
+    return (
+      <div className="w-full h-screen flex justify-center items-center bg-base-content">
+      <div className="flex flex-col gap-10 items-center">
+        <h1 className="text-4xl text-white font-fascinate md:text-6xl">
+          WHO KNOWS ME?!
+        </h1>
+
+        {/* Players */}
+        <div className="bg-white flex flex-col items-center p-5 rounded-2xl md:w-75">
+          
+        </div>
+        
+        <div className="divider divider-error"></div>
+
+         <div
+            className={`
+           w-full flex-col
+          card card-lg shadow-xl border h-full bg-ghost`}
+          >
+            <div className="border-b-2 p-4 shrink-0">
+              <h1 className="text-4xl font-excali text-error text-center">Chat</h1>
+            </div>
+
+            {/* Messages (dynamic) */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((m) => (
+                <div
+                  key={m.id}
+                  className={`chat ${
+                    m.sender === user.displayName ? "chat-end" : "chat-start"
+                  }`}
+                >
+                  <div className="chat-header text-primary-content ">{m.sender}</div>
+                  <div className="chat-bubble">{m.text}</div>
+                </div>
+              ))}
+              <div ref={messagesEndRef}></div>
+              <div />
+            </div>
+            {/* Controls */}
+            <div className="flex p-4 border-t  shrink-0">
+              <input
+                onChange={(e) => setInput(e.target.value)}
+                value={input}
+                className="input border-base-300 w-full mr-2 text-end"
+                placeholder="Type Here"
+                type="text"
+              />
+              <button
+                onClick={sendMessage}
+                className=" btn btn-info text-white"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+      </div>
+
+      
+    </div>
+    );
+  }
+
   return (
     <div className="w-full h-screen flex justify-center items-center bg-base-content">
       <div className="flex flex-col gap-10 items-center">

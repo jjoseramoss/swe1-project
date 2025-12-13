@@ -73,7 +73,7 @@ const GameNavbar = () => {
         </div>
 
         {/* Logo */}
-        <Link to="/" className="btn btn-ghost text-xl font-excali ml-1">
+        <Link to="/" className="btn btn-ghost text-xl font-fascinate ml-1">
           WHO KNOWS ME?!
         </Link>
       </div>

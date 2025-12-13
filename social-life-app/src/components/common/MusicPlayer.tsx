@@ -1,20 +1,21 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef} from "react";
 
 const songs = [
+  { name: "Halo Theme Song", artist: "Halo", url: "hts.mp3" },
+  { name: "On & On", artist: "Cartoon, Jéja", url: "onanon.mp3" },
+  { name: "All I Need", artist: "Slushii", url: "rls.mp3" },
+  { name: "Super Mario Bros 2", artist: "Mario", url: "smb2.mp3" },
   { name: "Challenge Accepted", artist: "The Sounding", url: "ca.mp3" },
   { name: "Simpin on You", artist: "The Sounding", url: "simpin.mp3" },
-  { name: "All The Smoke", artist: "The Sounding", url: "ats.mp3" },
-  { name: "You Know Me", artist: "Jeremy Black", url: "ykme.mp3" },
   { name: "Charm", artist: "Anno Domini Beats", url: "charm.mp3" },
   { name: "Touch", artist: "Anno Domini Beats", url: "touch.mp3" },
-  { name: "Nebula", artist: "The Grey Room", url: "nebula.mp3" },
+
 ];
 
 const MusicPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSong, setCurrentSong] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -25,27 +26,7 @@ const MusicPlayer = () => {
     }
   }
 
-  const handleSeek = (e: any) => {
-    if (!audioRef.current) return;
-    const val = Number(e.target.value || 0);
-    const newTime = (val / 100) * (audioRef.current.duration || 0);
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-
-  const formatTime = () => {
-    if (isNaN(duration) || duration === Infinity){
-      return '00:00';
-    }
-
-    const minutes = Math.floor(duration / 60);
-    const seconds = Math.floor(duration % 60);
-
-    const formatMinutes = String(minutes).padStart(2, '0');
-    const formatSeconds = String(seconds).padStart(2, '0');
-    
-    return `${formatMinutes}:${formatSeconds}`;
-  };
+   
 
   const handlePlay = async () => {
     if (!audioRef.current) return;
