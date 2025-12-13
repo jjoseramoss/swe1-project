@@ -1,9 +1,9 @@
 import type { ChangeEvent } from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import GameNavbar from "../components/common/GameNavbar";
 import { useAuth } from "../contexts/AuthProvider";
 import { socket } from "../lib/socket-io/socket";
+import { useNavigate } from "react-router-dom";
 
 const JoinGameForm = () => {
   const navigate = useNavigate();
@@ -20,7 +20,18 @@ const JoinGameForm = () => {
     setGameID(digits);
   }
 
+  const profile = user
+      ? {
+          uid: user.uid,
+          displayName: user.displayName,
+          avatarUrl: user.avatarUrl,
+          bio: user.bio,
+          insta: user.insta
+        }
+      : undefined;
+
   const isValid = (gameID.length === REQUIRED_LENGTH);
+  const reply = " ";
 
   const handleJoin = () => {
     if (!isValid || isChecking) return;
@@ -29,7 +40,8 @@ const JoinGameForm = () => {
     socket.emit("validate-room-code", gameID, (res: { ok: boolean }) => {
       setIsChecking(false);
       if (res?.ok) {
-        navigate(`/game/${gameID}`);
+        socket.emit('join-lobby', gameID, profile, reply);
+        navigate(`/gameplay/${gameID}`);
       } else {
         setError("Room not found or inactive.");
       }

@@ -11,6 +11,7 @@ const avatarList = [
   "robber.jpg",
   "think-monkey.jpg",
   "wizard-cat.jpg",
+  "raccoon-cool.jpg"
 ];
 
 const Profile = () => {

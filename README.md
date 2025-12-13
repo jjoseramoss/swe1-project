@@ -1,6 +1,6 @@
-Who Knows Me? 🎮
+# Who Knows Me? 🎮
 
-A social party game to get closer to your friends — available on web and mobile.
+A social party game to get closer to your friends.
 
 📖 Overview
 

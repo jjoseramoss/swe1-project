@@ -18,7 +18,7 @@ const GameCard = ({title, description, photo}: Card) => {
   };
 
   return (
-    <div className="card bg-base-300 w-96 shadow-sm">
+    <div className="card bg-base-300 w-96 shadow-sm border">
       <div className="h-6/10 w-full overflow-hidden">
           <img
             src={photo}

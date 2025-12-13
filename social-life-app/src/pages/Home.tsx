@@ -11,7 +11,7 @@ const Home = () => {
         <GameNavbar/>
       </div>
       <div className="min-h-screen bg-base-100 flex flex-col font-sans text-base-content">
-        
+       
         {/* --- SECTION 1: HERO (Top Login Button) --- */}
         <div className="hero min-h-[60vh] bg-base-200/50 pt-8 pb-10">
           <div className="hero-content flex-col lg:flex-row-reverse gap-10 w-full max-w-6xl px-4">
@@ -19,7 +19,7 @@ const Home = () => {
             <div className="shrink-0 relative">
               <div className="absolute -inset-2 bg-accent rounded-full blur opacity-40 animate-pulse"></div>
               <img
-                src="../public/wkme-home-banner.jpg"
+                src="/wkme-home-banner.jpg"
                 className="max-w-xs md:max-w-sm rounded-badge shadow-2xl border-4 border-base-100 relative z-10"
                 alt="Who Knows Me Game Banner"
               />
