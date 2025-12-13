@@ -77,7 +77,6 @@ const GameRoom = () => {
 
     switch (gameState) {
       case "setQ":
-      case "seQ":
         return isChosen ? <MakeQuestionForm /> : <WaitingForQuestion roomId={roomId} msg={ `Waiting for ${chosenName} to create a question...`}/>;
       case "setA":
         return isChosen ? <WaitingForQuestion roomId={roomId} msg={`Waiting for others to answer...`} /> : <AnswerQuestionForm chosenName={chosenName} question={question}/>;
