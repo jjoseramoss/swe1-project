@@ -58,6 +58,9 @@ const GameNavbar = () => {
               <Link to="/joingame">Join Game</Link>
             </li>
             <li>
+              <Link to="/games">Games</Link>
+            </li>
+            <li>
               <Link to="/profile">Profile</Link>
             </li>
             <li>
