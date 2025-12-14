@@ -56,6 +56,8 @@ const GameRoom = () => {
 
     const handleGameStateUpdated = (payload: { gameState?: string }) => {
       if (typeof payload?.gameState === "string") setGameState(payload.gameState);
+
+      console.log(payload?.gameState)
       refreshState(); // keep chosen/gameState in sync when server pushes updates
     };
 
@@ -83,7 +85,9 @@ const GameRoom = () => {
       case "setC":
         return isChosen ? <SelectCorrect /> : <WaitingForQuestion roomId={roomId} msg={`Waiting for ${chosenName} to select the correct answer...`}/>;
       case "viewL":
-        return <Leaderboard />;
+        return <Leaderboard msg="LEADERBOARD"/>;
+      case "end":
+          return <Leaderboard msg="FINAL LEADERBOARD"/>
       default:
         return <WaitingForQuestion roomId={roomId} msg="Waiting for game to start..."/>;
     }

@@ -369,6 +369,16 @@ io.on("connection", (socket) => {
     logActiveRooms(`started in room ${roomCode}`);
   });
 
+  socket.on("end-game", (roomCode) => {
+    const room = activeRooms.get(roomCode);
+    if(!room) return;
+
+    // set gameState to end
+    room.gameState = "end"
+    // send state to sockets
+    io.to(roomCode).emit("game-state-updated", {gameState: room.gameState});
+  })
+
   socket.on("next-player", (roomCode) => {
     const room = activeRooms.get(roomCode);
     const first = room.queue.values().next.value;
