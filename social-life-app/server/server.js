@@ -352,10 +352,14 @@ io.on("connection", (socket) => {
   socket.on("start-next-game", (roomCode) => {
     const room = activeRooms.get(roomCode);
     if (!room) return;
+    if (room.gameState !== "viewL") return;
     room.gameState = "setQ";
     // reset all answers at the start of the round
     for (const uid of room.answers.keys()) {
       room.answers.set(uid, "");
+    }
+    if (!room.queue || room.queue.size === 0) {
+      room.queue = new Set(room.userIds);
     }
     const iter = room.queue.values();
     const first = iter.next().value;
